@@ -40,7 +40,7 @@
       "extendInfo": {
         "LSUIElement": true
       },
-      "identity": null,
+      "sign": false,
       "hardenedRuntime": false
     },
     "files": [
