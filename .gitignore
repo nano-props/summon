@@ -1,0 +1,19 @@
+# IDE
+.idea/
+.fleet/
+.vscode/
+*.iml
+
+# Node
+node_modules/
+
+# Build output
+dist/
+dist-renderer/
+build/
+
+# OS
+.DS_Store
+
+# Environment
+.env
