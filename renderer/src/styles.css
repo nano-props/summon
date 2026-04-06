@@ -34,7 +34,8 @@ html {
 }
 
 html,
-body {
+body,
+#root {
   background: var(--color-bg);
   color: var(--color-text);
   overflow: hidden;

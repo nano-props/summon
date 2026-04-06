@@ -1,6 +1,6 @@
 {
   "name": "summon",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "description": "macOS app for switching between Ghostty terminal windows",
   "main": "src/main.ts",
