@@ -1,7 +1,7 @@
 import { app, BrowserWindow, Tray, ipcMain, nativeImage, screen, globalShortcut } from 'electron/main'
 import path from 'node:path'
 import { keyBy, isEqual, clamp } from 'lodash-es'
-import { listWindows, activateWindow, newTerminal, displayLabel } from './ghostty.ts'
+import { listWindows, activateWindow, newTerminal } from './ghostty.ts'
 import type { TerminalWindow } from './ghostty.ts'
 
 const isDev = !app.isPackaged
@@ -46,7 +46,6 @@ function windowDto(w: TerminalWindow) {
     title: w.title,
     cwd: w.cwd,
     tabCount: w.tabCount,
-    displayLabel: displayLabel(w),
     alias: aliases[w.id] || '',
   }
 }
@@ -94,7 +93,7 @@ function createMainWindow(): BrowserWindow {
 
   win.on('close', (e) => {
     e.preventDefault()
-    win.hide()
+    hidePanel()
   })
 
   return win
@@ -113,23 +112,75 @@ function positionWindowBelowTray(): void {
   mainWindow.setPosition(clamp(x, workArea.x + 8, workArea.x + workArea.width - winBounds.width - 8), y)
 }
 
+// --- Panel animation ---
+
+const ANIM_DURATION = 100 // ms
+const ANIM_INTERVAL = 16 // ~60fps
+const easeOut = (t: number) => 1 - (1 - t) * (1 - t)
+const easeIn = (t: number) => t * t
+
+let animTimer: ReturnType<typeof setInterval> | null = null
+let panelVisible = false
+
+function stopAnimation(): void {
+  if (animTimer) {
+    clearInterval(animTimer)
+    animTimer = null
+  }
+}
+
+function animateOpacity(
+  from: number,
+  to: number,
+  easing: (t: number) => number,
+  onComplete?: () => void,
+): void {
+  if (!mainWindow || mainWindow.isDestroyed()) return
+  stopAnimation()
+  mainWindow.setOpacity(from)
+  const start = Date.now()
+  animTimer = setInterval(() => {
+    const t = Math.min((Date.now() - start) / ANIM_DURATION, 1)
+    mainWindow?.setOpacity(from + (to - from) * easing(t))
+    if (t >= 1) {
+      stopAnimation()
+      onComplete?.()
+    }
+  }, ANIM_INTERVAL)
+}
+
+function showPanel(): void {
+  if (!mainWindow || mainWindow.isDestroyed()) return
+  panelVisible = true
+  mainWindow.show()
+  mainWindow.focus()
+  animateOpacity(0, 1, easeOut)
+}
+
+function hidePanel(): void {
+  if (!mainWindow || mainWindow.isDestroyed() || !panelVisible) return
+  panelVisible = false
+  animateOpacity(1, 0, easeIn, () => {
+    mainWindow?.hide()
+    mainWindow?.setOpacity(1)
+  })
+}
+
 function toggleMainWindow(): void {
   if (!mainWindow || mainWindow.isDestroyed()) {
     mainWindow = createMainWindow()
     mainWindow.once('ready-to-show', () => {
       positionWindowBelowTray()
-      mainWindow!.show()
-      mainWindow!.focus()
+      showPanel()
     })
     return
   }
 
-  if (mainWindow.isVisible()) {
-    mainWindow.hide()
+  if (panelVisible) {
+    hidePanel()
   } else {
     positionWindowBelowTray()
-    mainWindow.show()
-    mainWindow.focus()
+    showPanel()
   }
 }
 
@@ -157,7 +208,7 @@ ipcMain.handle('get-windows', (event) => {
 ipcMain.handle('activate-window', async (event, id: string) => {
   if (!validateSender(event.senderFrame)) return null
   await activateWindow(id)
-  mainWindow?.hide()
+  hidePanel()
   return { ok: true }
 })
 
@@ -185,13 +236,13 @@ ipcMain.handle('reorder-windows', async (event, orderedIds: string[]) => {
 ipcMain.handle('new-terminal', async (event) => {
   if (!validateSender(event.senderFrame)) return null
   await newTerminal()
-  mainWindow?.hide()
+  hidePanel()
   return { ok: true }
 })
 
 ipcMain.handle('hide-panel', (event) => {
   if (!validateSender(event.senderFrame)) return null
-  mainWindow?.hide()
+  hidePanel()
 })
 
 ipcMain.handle('quit', (event) => {
@@ -207,9 +258,13 @@ app.whenReady().then(() => {
   const trayIcon = nativeImage.createFromPath(path.join(import.meta.dirname, '..', 'icons', 'summon-tray.png'))
   tray = new Tray(trayIcon.resize({ width: 18, height: 18 }))
   tray.setToolTip('Summon')
+  tray.setIgnoreDoubleClickEvents(true)
   tray.on('click', toggleMainWindow)
 
-  globalShortcut.register('Option+S', toggleMainWindow)
+  const registered = globalShortcut.register('Option+Space', toggleMainWindow)
+  if (!registered) {
+    console.warn('Failed to register global shortcut Option+Space — may be in use by another app')
+  }
 
   refreshWindows()
   refreshTimer = setInterval(refreshWindows, 2000)
@@ -220,6 +275,7 @@ app.on('second-instance', () => {
 })
 
 app.on('before-quit', () => {
+  stopAnimation()
   globalShortcut.unregisterAll()
   if (refreshTimer) clearInterval(refreshTimer)
   if (mainWindow && !mainWindow.isDestroyed()) {

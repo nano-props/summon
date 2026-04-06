@@ -1,5 +1,4 @@
 import { execFile } from 'node:child_process'
-import { last } from 'lodash-es'
 
 const BUNDLE_ID = 'com.mitchellh.ghostty'
 
@@ -85,15 +84,3 @@ export async function newTerminal(): Promise<void> {
   await runAppleScript(script)
 }
 
-export function dirName(path: string): string {
-  return last(path.split('/')) || path
-}
-
-export function displayLabel(w: TerminalWindow): string {
-  const title = w.title || null
-  const dir = w.cwd ? dirName(w.cwd) : null
-  if (title && dir) return `${title} \u00b7 ${dir}`
-  if (title) return title
-  if (dir) return dir
-  return '(untitled)'
-}

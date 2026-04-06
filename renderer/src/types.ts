@@ -3,7 +3,6 @@ export interface WindowDTO {
   title: string
   cwd: string
   tabCount: number
-  displayLabel: string
   alias: string
 }
 

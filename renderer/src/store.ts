@@ -6,11 +6,13 @@ interface SummonState {
   version: string
   windows: WindowDTO[]
   query: string
+  selectedIndex: number
   savedId: string | null
   dark: boolean
   _lastData: unknown
 
   setQuery: (q: string) => void
+  setSelectedIndex: (i: number) => void
   toggleTheme: () => void
   fetchWindows: () => Promise<void>
   activateWindow: (id: string) => Promise<void>
@@ -24,6 +26,7 @@ export const useStore = create<SummonState>((set, get) => ({
   version: '',
   windows: [],
   query: '',
+  selectedIndex: -1,
   savedId: null,
   dark: (() => {
     const isDark = localStorage.getItem('theme') === 'dark'
@@ -32,7 +35,8 @@ export const useStore = create<SummonState>((set, get) => ({
   })(),
   _lastData: null,
 
-  setQuery: (q) => set({ query: q }),
+  setQuery: (q) => set({ query: q, selectedIndex: -1 }),
+  setSelectedIndex: (i) => set({ selectedIndex: i }),
 
   toggleTheme: () => {
     const next = !get().dark
