@@ -39,7 +39,9 @@
       ],
       "extendInfo": {
         "LSUIElement": true
-      }
+      },
+      "identity": null,
+      "hardenedRuntime": false
     },
     "files": [
       "src/**/*",
