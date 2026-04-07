@@ -13,6 +13,10 @@ export function Footer() {
         </kbd>{' '}
         Toggle |{' '}
         <kbd className="inline-block bg-surface border border-border rounded px-1.5 py-px text-[10px] mx-0.5">
+          Tab
+        </kbd>{' '}
+        Edit alias |{' '}
+        <kbd className="inline-block bg-surface border border-border rounded px-1.5 py-px text-[10px] mx-0.5">
           Esc
         </kbd>{' '}
         Hide

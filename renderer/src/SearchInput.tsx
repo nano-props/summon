@@ -24,6 +24,7 @@ export function SearchInput({ inputRef }: { inputRef: React.RefObject<HTMLInputE
           onClick={() => { setQuery(''); inputRef.current?.focus() }}
           className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center p-0 bg-transparent border-none text-text-muted hover:text-text transition-colors duration-150 cursor-pointer"
           aria-label="Clear search"
+          tabIndex={-1}
         >
           <Icon size={14}><CloseOutline /></Icon>
         </button>

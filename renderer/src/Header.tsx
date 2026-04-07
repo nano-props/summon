@@ -40,6 +40,7 @@ export function Header() {
                 toggleTheme()
                 setMenuOpen(false)
               }}
+              tabIndex={-1}
             >
               {dark ? <Icon size={14}><SunnyOutline /></Icon> : <Icon size={14}><MoonOutline /></Icon>}
               {dark ? 'Light mode' : 'Dark mode'}
@@ -48,6 +49,7 @@ export function Header() {
             <button
               className="w-full px-4 py-2 text-left text-[13px] text-text hover:bg-surface-hover flex items-center gap-2.5 cursor-pointer hover:text-red-500"
               onClick={() => window.summonAPI.quit()}
+              tabIndex={-1}
             >
               <Icon size={14}><PowerOutline /></Icon>
               Quit Summon

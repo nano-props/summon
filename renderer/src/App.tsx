@@ -8,9 +8,10 @@ import { WindowCard } from './WindowCard'
 import { Header } from './Header'
 import { SearchInput } from './SearchInput'
 import { Footer } from './Footer'
+import { useKeyboardNav } from './useKeyboardNav'
 
 export function App() {
-  const { windows, query, selectedIndex, setSelectedIndex, fetchWindows, activateWindow, reorderWindows } = useStore()
+  const { windows, query, selectedIndex, setSelectedIndex, fetchWindows, reorderWindows } = useStore()
   const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -29,49 +30,14 @@ export function App() {
   const filteredRef = useRef(filtered)
   filteredRef.current = filtered
 
+  const handleCardRef = useKeyboardNav(searchRef, filteredRef)
+
   // Clamp selectedIndex when filtered list shrinks
   useEffect(() => {
     if (selectedIndex >= filtered.length) {
       setSelectedIndex(Math.max(filtered.length - 1, -1))
     }
   }, [filtered.length, selectedIndex, setSelectedIndex])
-
-  useEffect(() => {
-    const onFocus = () => {
-      useStore.getState().setSelectedIndex(-1)
-      searchRef.current?.focus()
-    }
-    const onKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept when alias input is focused
-      if ((e.target as HTMLElement).tagName === 'INPUT' && e.target !== searchRef.current) return
-
-      if (e.key === 'Escape') {
-        window.summonAPI.hidePanel()
-        return
-      }
-      const { selectedIndex, setSelectedIndex, activateWindow } = useStore.getState()
-      const list = filteredRef.current
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        setSelectedIndex(Math.min(selectedIndex + 1, list.length - 1))
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        const next = selectedIndex - 1
-        setSelectedIndex(Math.max(next, -1))
-        if (next < 0) searchRef.current?.focus()
-      } else if (e.key === 'Enter') {
-        if (selectedIndex >= 0 && selectedIndex < list.length) {
-          activateWindow(list[selectedIndex].id)
-        }
-      }
-    }
-    window.addEventListener('focus', onFocus)
-    window.addEventListener('keydown', onKeyDown)
-    return () => {
-      window.removeEventListener('focus', onFocus)
-      window.removeEventListener('keydown', onKeyDown)
-    }
-  }, [])
 
   // Scroll selected item into view
   const listRef = useRef<HTMLDivElement>(null)
@@ -131,7 +97,14 @@ export function App() {
           </div>
         ) : (
           <div ref={listCallbackRef} className="flex flex-col gap-1">
-            {filtered.map((w, i) => <WindowCard key={w.id} window={w} selected={i === selectedIndex} />)}
+            {filtered.map((w, i) => (
+              <WindowCard
+                key={w.id}
+                window={w}
+                selected={i === selectedIndex}
+                onHandle={handleCardRef}
+              />
+            ))}
           </div>
         )}
 

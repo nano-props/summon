@@ -4,9 +4,23 @@ import { Icon } from './Icon'
 import { useStore } from './store'
 import type { WindowDTO } from './types'
 
-export function WindowCard({ window: w, selected }: { window: WindowDTO; selected?: boolean }) {
+export interface WindowCardHandle {
+  focusInput: () => void
+  isInputFocused: () => boolean
+}
+
+export function WindowCard({ window: w, selected, onHandle }: { window: WindowDTO; selected?: boolean; onHandle?: (id: string, handle: WindowCardHandle | null) => void }) {
   const { savedId, activateWindow, saveAlias } = useStore()
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const handle: WindowCardHandle = {
+      focusInput: () => inputRef.current?.focus(),
+      isInputFocused: () => document.activeElement === inputRef.current,
+    }
+    onHandle?.(w.id, handle)
+    return () => onHandle?.(w.id, null)
+  }, [w.id, onHandle])
   const [draft, setDraft] = useState(w.alias)
   const [focused, setFocused] = useState(false)
 
@@ -27,7 +41,8 @@ export function WindowCard({ window: w, selected }: { window: WindowDTO; selecte
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' || e.key === 'Escape') {
+      e.preventDefault()
       inputRef.current?.blur()
     }
   }
