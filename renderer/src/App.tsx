@@ -8,7 +8,7 @@ import { WindowCard } from './WindowCard'
 import { Header } from './Header'
 import { SearchInput } from './SearchInput'
 import { Footer } from './Footer'
-import { useKeyboardNav } from './useKeyboardNav'
+import { useKeyboardNav, shortcutLabel } from './useKeyboardNav'
 
 export function App() {
   const { windows, query, selectedIndex, setSelectedIndex, fetchWindows, reorderWindows } = useStore()
@@ -102,6 +102,7 @@ export function App() {
                 key={w.id}
                 window={w}
                 selected={i === selectedIndex}
+                shortcut={shortcutLabel(i)}
                 onHandle={handleCardRef}
               />
             ))}

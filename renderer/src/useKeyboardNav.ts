@@ -3,6 +3,14 @@ import { useStore } from './store'
 import type { WindowCardHandle } from './WindowCard'
 import type { WindowDTO } from './types'
 
+// ⌘1–⌘9, ⌘0, ⌘A–⌘Z  →  index 0-35
+const SHORTCUT_KEYS = '1234567890abcdefghijklmnopqrstuvwxyz'
+
+export function shortcutLabel(index: number): string | null {
+  if (index < 0 || index >= SHORTCUT_KEYS.length) return null
+  return SHORTCUT_KEYS[index].toUpperCase()
+}
+
 export function useKeyboardNav(
   searchRef: React.RefObject<HTMLInputElement | null>,
   filteredRef: React.RefObject<WindowDTO[]>,
@@ -50,6 +58,21 @@ export function useKeyboardNav(
           searchRef.current?.focus()
         }
         return
+      }
+
+      // ⌘+key quick activate
+      // In alias input: only digits (⌘1-⌘0) to avoid blocking ⌘A/C/V/X/Z
+      if (e.metaKey && !e.ctrlKey && !e.altKey) {
+        const key = e.key.toLowerCase()
+        if (!inAliasInput || (key >= '0' && key <= '9')) {
+          const list = filteredRef.current!
+          const idx = SHORTCUT_KEYS.indexOf(key)
+          if (idx >= 0 && idx < list.length) {
+            e.preventDefault()
+            useStore.getState().activateWindow(list[idx].id)
+          }
+          return
+        }
       }
 
       // Other keys: don't intercept when alias input is focused

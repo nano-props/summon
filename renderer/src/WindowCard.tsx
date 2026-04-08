@@ -9,7 +9,14 @@ export interface WindowCardHandle {
   isInputFocused: () => boolean
 }
 
-export function WindowCard({ window: w, selected, onHandle }: { window: WindowDTO; selected?: boolean; onHandle?: (id: string, handle: WindowCardHandle | null) => void }) {
+interface WindowCardProps {
+  window: WindowDTO
+  selected?: boolean
+  shortcut?: string | null
+  onHandle?: (id: string, handle: WindowCardHandle | null) => void
+}
+
+export function WindowCard({ window: w, selected, shortcut, onHandle }: WindowCardProps) {
   const { savedId, activateWindow, saveAlias } = useStore()
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -51,7 +58,7 @@ export function WindowCard({ window: w, selected, onHandle }: { window: WindowDT
 
   return (
     <div
-      className={`bg-surface border rounded-[10px] px-4 py-3.5 flex flex-wrap items-center gap-x-3.5 gap-y-2.5 cursor-pointer transition-[background,border-color,transform] duration-150 hover:bg-surface-hover hover:translate-x-0.5 ${selected ? 'border-accent bg-surface-hover' : 'border-border'}`}
+      className={`relative bg-surface border rounded-[10px] px-4 py-3.5 flex flex-wrap items-center gap-x-3.5 gap-y-2.5 cursor-pointer transition-[background,border-color,transform] duration-150 hover:bg-surface-hover hover:translate-x-0.5 ${selected ? 'border-accent bg-surface-hover' : 'border-border'}`}
       onClick={handleClick}
       data-id={w.id}
     >
@@ -81,6 +88,11 @@ export function WindowCard({ window: w, selected, onHandle }: { window: WindowDT
         placeholder="alias"
         spellCheck={false}
       />
+      {shortcut && (
+        <span className="absolute top-1 right-1.5 text-[11px] leading-none text-text-muted opacity-50 font-mono pointer-events-none">
+          {shortcut}
+        </span>
+      )}
     </div>
   )
 }
