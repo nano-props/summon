@@ -15,7 +15,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 VERSION=$(bun -e "import pkg from './package.json'; console.log(pkg.version)")
-TAG="v$VERSION"
+TAG="$VERSION"
 
 # Check for uncommitted changes
 if [ -n "$(git status --porcelain)" ]; then

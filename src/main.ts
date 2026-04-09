@@ -1,8 +1,11 @@
 import { app, BrowserWindow, Tray, ipcMain, nativeImage, screen, globalShortcut } from 'electron/main'
 import path from 'node:path'
-import { keyBy, isEqual, clamp } from 'lodash-es'
-import { listWindows, activateWindow, newTerminal } from './ghostty.ts'
-import type { TerminalWindow } from './ghostty.ts'
+import { clamp } from 'lodash-es'
+import { activateWindow, newTerminal } from './ghostty.ts'
+import { calcPlacementX, PANEL_GAP, SCREEN_PADDING } from './placement.ts'
+import type { Placement } from './placement.ts'
+import { refreshWindows, getWindowDtos, saveAlias, reorder } from './window-store.ts'
+import { fadeIn, fadeOut, stopAnimation } from './panel-animator.ts'
 
 const isDev = !app.isPackaged
 
@@ -17,52 +20,8 @@ if (!app.requestSingleInstanceLock()) {
 
 let tray: Tray | null = null
 let mainWindow: BrowserWindow | null = null
-let cachedWindows: TerminalWindow[] = []
-const knownOrderSet = new Set<string>()
-let knownOrderList: string[] = []
-const aliases: Record<string, string> = {}
+let panelVisible = false
 let refreshTimer: ReturnType<typeof setInterval> | null = null
-let lastSnapshot: { windows: TerminalWindow[]; aliases: Record<string, string> } | null = null
-
-// --- Window management ---
-
-function stableSort(windows: TerminalWindow[]): TerminalWindow[] {
-  const byId = keyBy(windows, 'id')
-  for (const w of windows) {
-    if (!knownOrderSet.has(w.id)) {
-      knownOrderSet.add(w.id)
-      knownOrderList.push(w.id)
-    }
-  }
-  knownOrderList = knownOrderList.filter((id) => id in byId)
-  knownOrderSet.clear()
-  for (const id of knownOrderList) knownOrderSet.add(id)
-  return knownOrderList.map((id) => byId[id])
-}
-
-function windowDto(w: TerminalWindow) {
-  return {
-    id: w.id,
-    title: w.title,
-    cwd: w.cwd,
-    tabCount: w.tabCount,
-    alias: aliases[w.id] || '',
-  }
-}
-
-async function refreshWindows(): Promise<void> {
-  try {
-    const latest = await listWindows()
-    const sorted = stableSort(latest)
-    const snapshot = { windows: sorted, aliases: { ...aliases } }
-    if (!isEqual(snapshot, lastSnapshot)) {
-      lastSnapshot = snapshot
-      cachedWindows = sorted
-    }
-  } catch (e: any) {
-    console.error('Refresh failed:', e.message)
-  }
-}
 
 // --- Main window ---
 
@@ -99,70 +58,40 @@ function createMainWindow(): BrowserWindow {
   return win
 }
 
-function positionWindowBelowTray(): void {
+function positionWindowBelowTray(placement: Placement = 'bottom-start'): void {
   if (!mainWindow || !tray) return
   const trayBounds = tray.getBounds()
   const winBounds = mainWindow.getBounds()
   const display = screen.getDisplayNearestPoint({ x: trayBounds.x, y: trayBounds.y })
   const workArea = display.workArea
 
-  const x = Math.round(trayBounds.x + trayBounds.width / 2 - winBounds.width / 2)
-  const y = trayBounds.y + trayBounds.height + 4
+  const x = calcPlacementX(placement, trayBounds, winBounds.width)
+  const y = trayBounds.y + trayBounds.height + PANEL_GAP
 
-  mainWindow.setPosition(clamp(x, workArea.x + 8, workArea.x + workArea.width - winBounds.width - 8), y)
+  const minX = workArea.x + SCREEN_PADDING
+  const maxX = workArea.x + workArea.width - winBounds.width - SCREEN_PADDING
+  mainWindow.setPosition(clamp(x, minX, maxX), y)
 }
 
-// --- Panel animation ---
-
-const ANIM_DURATION = 100 // ms
-const ANIM_INTERVAL = 16 // ~60fps
-const easeOut = (t: number) => 1 - (1 - t) * (1 - t)
-const easeIn = (t: number) => t * t
-
-let animTimer: ReturnType<typeof setInterval> | null = null
-let panelVisible = false
-
-function stopAnimation(): void {
-  if (animTimer) {
-    clearInterval(animTimer)
-    animTimer = null
-  }
-}
-
-function animateOpacity(
-  from: number,
-  to: number,
-  easing: (t: number) => number,
-  onComplete?: () => void,
-): void {
-  if (!mainWindow || mainWindow.isDestroyed()) return
-  stopAnimation()
-  mainWindow.setOpacity(from)
-  const start = Date.now()
-  animTimer = setInterval(() => {
-    const t = Math.min((Date.now() - start) / ANIM_DURATION, 1)
-    mainWindow?.setOpacity(from + (to - from) * easing(t))
-    if (t >= 1) {
-      stopAnimation()
-      onComplete?.()
-    }
-  }, ANIM_INTERVAL)
-}
+// --- Panel show/hide ---
 
 function showPanel(): void {
   if (!mainWindow || mainWindow.isDestroyed()) return
   panelVisible = true
   mainWindow.show()
   mainWindow.focus()
-  animateOpacity(0, 1, easeOut)
+  fadeIn(mainWindow)
 }
 
 function hidePanel(): void {
   if (!mainWindow || mainWindow.isDestroyed() || !panelVisible) return
   panelVisible = false
-  animateOpacity(1, 0, easeIn, () => {
-    mainWindow?.hide()
-    mainWindow?.setOpacity(1)
+  const win = mainWindow
+  fadeOut(win, () => {
+    if (!win.isDestroyed()) {
+      win.hide()
+      win.setOpacity(1)
+    }
   })
 }
 
@@ -199,10 +128,7 @@ function validateSender(frame: Electron.WebFrameMain): boolean {
 
 ipcMain.handle('get-windows', (event) => {
   if (!validateSender(event.senderFrame)) return null
-  return {
-    version: app.getVersion(),
-    windows: cachedWindows.map(windowDto),
-  }
+  return { version: app.getVersion(), windows: getWindowDtos() }
 })
 
 ipcMain.handle('activate-window', async (event, id: string) => {
@@ -214,21 +140,13 @@ ipcMain.handle('activate-window', async (event, id: string) => {
 
 ipcMain.handle('save-alias', (event, id: string, alias: string) => {
   if (!validateSender(event.senderFrame)) return null
-  if (!alias || !alias.trim()) {
-    delete aliases[id]
-  } else {
-    aliases[id] = alias.trim()
-  }
-  lastSnapshot = null
+  saveAlias(id, alias)
   return { ok: true }
 })
 
 ipcMain.handle('reorder-windows', async (event, orderedIds: string[]) => {
   if (!validateSender(event.senderFrame)) return null
-  knownOrderList = orderedIds.filter((id) => knownOrderSet.has(id))
-  knownOrderSet.clear()
-  for (const id of knownOrderList) knownOrderSet.add(id)
-  lastSnapshot = null
+  reorder(orderedIds)
   await refreshWindows()
   return { ok: true }
 })

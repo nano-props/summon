@@ -3,8 +3,8 @@ import { useStore } from './store'
 import type { WindowCardHandle } from './WindowCard'
 import type { WindowDTO } from './types'
 
-// ⌘1–⌘9, ⌘0, ⌘A–⌘Z  →  index 0-35
-const SHORTCUT_KEYS = '1234567890abcdefghijklmnopqrstuvwxyz'
+// ⌘1–⌘9  →  index 0-8
+const SHORTCUT_KEYS = '123456789'
 
 export function shortcutLabel(index: number): string | null {
   if (index < 0 || index >= SHORTCUT_KEYS.length) return null
@@ -60,11 +60,11 @@ export function useKeyboardNav(
         return
       }
 
-      // ⌘+key quick activate
-      // In alias input: only digits (⌘1-⌘0) to avoid blocking ⌘A/C/V/X/Z
+      // ⌘+digit quick activate
+      // In alias input: only ⌘1-⌘9 to avoid blocking ⌘A/C/V/X/Z
       if (e.metaKey && !e.ctrlKey && !e.altKey) {
         const key = e.key.toLowerCase()
-        if (!inAliasInput || (key >= '0' && key <= '9')) {
+        if (SHORTCUT_KEYS.includes(key)) {
           const list = filteredRef.current!
           const idx = SHORTCUT_KEYS.indexOf(key)
           if (idx >= 0 && idx < list.length) {
