@@ -70,7 +70,7 @@ export function WindowCard({ window: w, selected, shortcut, onHandle }: WindowCa
       </div>
       <div className="flex-1 min-w-[200px]">
         <div className="font-semibold text-[14px] text-text truncate">{w.title || '(untitled)'}</div>
-        <div className="text-[11px] text-text-muted mt-0.5 truncate">
+        <div className="text-[12px] text-text-dim mt-0.5 truncate">
           {w.cwd && <span>{w.cwd.split('/').pop() || w.cwd}</span>}
           {w.tabCount > 1 && <span className="text-text-muted ml-1.5">{w.tabCount} tabs</span>}
         </div>
