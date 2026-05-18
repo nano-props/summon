@@ -6,11 +6,6 @@ import type { WindowDTO } from './types'
 // ⌘1–⌘9  →  index 0-8
 const SHORTCUT_KEYS = '123456789'
 
-export function shortcutLabel(index: number): string | null {
-  if (index < 0 || index >= SHORTCUT_KEYS.length) return null
-  return SHORTCUT_KEYS[index].toUpperCase()
-}
-
 export function useKeyboardNav(
   searchRef: React.RefObject<HTMLInputElement | null>,
   filteredRef: React.RefObject<WindowDTO[]>,
@@ -45,9 +40,14 @@ export function useKeyboardNav(
         }
 
         // In alias → move to next/prev; otherwise → enter edit mode on current (or first/last)
-        const next = inAliasInput
-          ? current + (e.shiftKey ? -1 : 1)
-          : (current >= 0 ? current : (e.shiftKey ? list.length - 1 : 0))
+        let next: number
+        if (inAliasInput) {
+          next = current + (e.shiftKey ? -1 : 1)
+        } else if (current >= 0) {
+          next = current
+        } else {
+          next = e.shiftKey ? list.length - 1 : 0
+        }
 
         if (next >= 0 && next < list.length) {
           setSelectedIndex(next)

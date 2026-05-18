@@ -13,11 +13,10 @@ export interface WindowCardHandle {
 interface WindowCardProps {
   window: WindowDTO
   selected?: boolean
-  shortcut?: string | null
   onHandle?: (id: string, handle: WindowCardHandle | null) => void
 }
 
-export function WindowCard({ window: w, selected, shortcut, onHandle }: WindowCardProps) {
+export function WindowCard({ window: w, selected, onHandle }: WindowCardProps) {
   const { savedId, activateWindow, saveAlias } = useStore()
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -58,6 +57,8 @@ export function WindowCard({ window: w, selected, shortcut, onHandle }: WindowCa
 
   const isSaved = savedId === w.id
   const dirName = w.cwd ? w.cwd.split('/').pop() || w.cwd : '(no path)'
+  const hasAlias = draft.trim().length > 0
+  const showAlias = focused || hasAlias
 
   return (
     <div
@@ -77,7 +78,7 @@ export function WindowCard({ window: w, selected, shortcut, onHandle }: WindowCa
       </div>
 
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0 pr-20">
           <span className="font-medium text-sm truncate leading-tight">{dirName}</span>
           {w.tabCount > 1 && (
             <span className="shrink-0 text-[10px] font-medium text-secondary-foreground bg-secondary rounded px-1.5 py-0.5 leading-none">
@@ -85,19 +86,19 @@ export function WindowCard({ window: w, selected, shortcut, onHandle }: WindowCa
             </span>
           )}
         </div>
-        <div className="text-xs text-muted-foreground mt-0.5 truncate leading-tight">
-          {w.title || '(untitled)'}
-        </div>
+        <div className="text-xs text-muted-foreground mt-0.5 truncate leading-tight">{w.title || '(untitled)'}</div>
       </div>
 
       <Input
         ref={inputRef}
         type="text"
         className={cn(
-          'h-7 w-[96px] shrink-0 text-xs px-2 text-right',
-          'border-transparent bg-transparent shadow-none placeholder:text-muted-foreground/50',
+          'absolute top-1.5 right-2 h-5 w-20 text-[11px] px-1.5 text-right',
+          'border-transparent bg-transparent shadow-none',
+          'opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity',
           'hover:bg-background hover:border-input',
           'focus-visible:text-left focus-visible:bg-background',
+          showAlias && 'opacity-100',
           isSaved && 'border-emerald-500 ring-2 ring-emerald-500/30',
         )}
         value={draft}
@@ -106,15 +107,8 @@ export function WindowCard({ window: w, selected, shortcut, onHandle }: WindowCa
         onBlur={handleBlur}
         onKeyDown={handleKeyDown}
         onClick={(e) => e.stopPropagation()}
-        placeholder="alias"
         spellCheck={false}
       />
-
-      {shortcut && (
-        <kbd className="shrink-0 text-[10px] font-mono text-muted-foreground/70 bg-muted/60 border border-border rounded px-1.5 py-0.5 leading-none pointer-events-none">
-          ⌘{shortcut}
-        </kbd>
-      )}
     </div>
   )
 }
