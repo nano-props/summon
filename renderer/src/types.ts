@@ -11,6 +11,14 @@ export interface WindowsResponse {
   windows: WindowDTO[]
 }
 
+export type ThemeMode = 'light' | 'dark' | 'auto'
+
+export interface Prefs {
+  pinned: boolean
+  shortcutEnabled: boolean
+  theme: ThemeMode
+}
+
 export interface SummonAPI {
   getWindows: () => Promise<WindowsResponse>
   activateWindow: (id: string) => Promise<{ ok: boolean }>
@@ -18,6 +26,10 @@ export interface SummonAPI {
   reorderWindows: (orderedIds: string[]) => Promise<{ ok: boolean }>
   newTerminal: () => Promise<{ ok: boolean }>
   hidePanel: () => Promise<void>
+  getPrefs: () => Promise<Prefs>
+  setPinned: (value: boolean) => Promise<{ ok: boolean }>
+  setShortcutEnabled: (value: boolean) => Promise<{ ok: boolean }>
+  setTheme: (value: ThemeMode) => Promise<{ ok: boolean }>
   quit: () => Promise<void>
 }
 

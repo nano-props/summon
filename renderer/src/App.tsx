@@ -2,8 +2,7 @@ import { useEffect, useMemo, useRef, useCallback } from 'react'
 import Sortable from 'sortablejs'
 import { some } from 'lodash-es'
 import { useStore } from './store'
-import { AppsOutline } from '@ricons/ionicons5'
-import { Icon } from './Icon'
+import { LayoutGrid } from 'lucide-react'
 import { WindowCard } from './WindowCard'
 import { Header } from './Header'
 import { SearchInput } from './SearchInput'
@@ -11,14 +10,15 @@ import { Footer } from './Footer'
 import { useKeyboardNav, shortcutLabel } from './useKeyboardNav'
 
 export function App() {
-  const { windows, query, selectedIndex, setSelectedIndex, fetchWindows, reorderWindows } = useStore()
+  const { windows, query, selectedIndex, setSelectedIndex, fetchWindows, reorderWindows, hydrate } = useStore()
   const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    hydrate()
     fetchWindows()
     const timer = setInterval(fetchWindows, 2000)
     return () => clearInterval(timer)
-  }, [fetchWindows])
+  }, [fetchWindows, hydrate])
 
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim()
@@ -84,19 +84,21 @@ export function App() {
   }, [])
 
   return (
-    <div className="h-full flex flex-col rounded-xl overflow-hidden select-none">
+    <div className="h-full flex flex-col rounded-xl overflow-hidden select-none bg-background text-foreground">
       <Header />
 
-      <div className="flex-1 overflow-y-auto px-5 pb-5">
+      <div className="px-3 shrink-0">
         <SearchInput inputRef={searchRef} />
+      </div>
 
+      <div className="flex-1 overflow-y-auto px-2 pb-1">
         {filtered.length === 0 ? (
-          <div className="text-center py-12 px-5 text-text-muted text-[13px]">
-            <Icon size={32} className="inline-block mb-3 opacity-40"><AppsOutline /></Icon>
+          <div className="flex flex-col items-center justify-center text-center py-12 px-3 text-muted-foreground text-sm gap-2">
+            <LayoutGrid className="size-7 opacity-30" />
             <div>{windows.length === 0 ? 'No Ghostty windows open' : 'No matching windows'}</div>
           </div>
         ) : (
-          <div ref={listCallbackRef} className="flex flex-col gap-1">
+          <div ref={listCallbackRef} className="flex flex-col gap-1 px-1 py-1">
             {filtered.map((w, i) => (
               <WindowCard
                 key={w.id}
@@ -108,7 +110,9 @@ export function App() {
             ))}
           </div>
         )}
+      </div>
 
+      <div className="px-3 pb-3 shrink-0">
         <Footer />
       </div>
     </div>

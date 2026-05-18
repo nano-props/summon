@@ -1,62 +1,68 @@
-import { useEffect, useRef, useState } from 'react'
 import { useStore } from './store'
-import { SunnyOutline, MoonOutline, EllipsisVertical, PowerOutline, ChevronUpOutline, TerminalOutline } from '@ricons/ionicons5'
-import { Icon } from './Icon'
+import { Sun, Moon, Monitor, MoreVertical, Power, ChevronUp, Terminal, Pin, Keyboard } from 'lucide-react'
 import { HeaderButton } from './HeaderButton'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuCheckboxItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+} from '@/components/ui/dropdown-menu'
+import type { ThemeMode } from './types'
 
 export function Header() {
-  const { dark, toggleTheme } = useStore()
-  const [menuOpen, setMenuOpen] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!menuOpen) return
-    const onClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false)
-      }
-    }
-    document.addEventListener('mousedown', onClick)
-    return () => document.removeEventListener('mousedown', onClick)
-  }, [menuOpen])
+  const { theme, setTheme, pinned, togglePin, shortcutEnabled, toggleShortcut } = useStore()
 
   return (
-    <div className="flex items-center gap-3 px-5 pt-5 pb-3 shrink-0">
-      <h1 className="text-[21px] font-bold tracking-tight text-accent">Summon</h1>
-      <span className="text-[10px] text-text-muted tracking-wider uppercase">
-        <span className="inline-block w-1.5 h-1.5 rounded-full bg-green mr-1.5 shadow-[0_0_8px_rgba(74,222,128,0.4)] animate-[pulse-dot_2s_ease-in-out_infinite]" />
-        watching
-      </span>
+    <div className="flex items-center gap-1 px-3 pt-3 pb-2 shrink-0">
+      <h1 className="text-sm font-semibold tracking-tight flex items-center gap-1.5">
+        Summon
+        <span
+          title="Watching Ghostty windows"
+          className="inline-block size-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.6)] animate-[pulse-dot_2s_ease-in-out_infinite]"
+        />
+      </h1>
       <span className="flex-1" />
-      <HeaderButton icon={<TerminalOutline />} title="New Terminal" onClick={() => window.summonAPI.newTerminal()} />
-      <HeaderButton icon={<ChevronUpOutline />} title="Hide (Esc)" onClick={() => window.summonAPI.hidePanel()} />
-      <div className="relative" ref={menuRef}>
-        <HeaderButton icon={<EllipsisVertical />} title="More" onClick={() => setMenuOpen(!menuOpen)} />
-        {menuOpen && (
-          <div className="absolute right-0 top-11 bg-surface border border-border rounded-lg shadow-lg py-1 min-w-[160px] z-50">
-            <button
-              className="w-full px-4 py-2 text-left text-[13px] text-text hover:bg-surface-hover flex items-center gap-2.5 cursor-pointer"
-              onClick={() => {
-                toggleTheme()
-                setMenuOpen(false)
-              }}
-              tabIndex={-1}
-            >
-              {dark ? <Icon size={14}><SunnyOutline /></Icon> : <Icon size={14}><MoonOutline /></Icon>}
-              {dark ? 'Light mode' : 'Dark mode'}
-            </button>
-            <div className="h-px bg-border mx-2 my-1" />
-            <button
-              className="w-full px-4 py-2 text-left text-[13px] text-text hover:bg-surface-hover flex items-center gap-2.5 cursor-pointer hover:text-red-500"
-              onClick={() => window.summonAPI.quit()}
-              tabIndex={-1}
-            >
-              <Icon size={14}><PowerOutline /></Icon>
-              Quit Summon
-            </button>
-          </div>
-        )}
-      </div>
+      <HeaderButton icon={<Terminal />} title="New Terminal" onClick={() => window.summonAPI.newTerminal()} />
+      <HeaderButton
+        icon={<Pin fill={pinned ? 'currentColor' : 'none'} />}
+        title={pinned ? 'Unpin (auto-hide)' : 'Pin (stay open)'}
+        active={pinned}
+        onClick={togglePin}
+      />
+      <HeaderButton icon={<ChevronUp />} title="Hide (Esc)" onClick={() => window.summonAPI.hidePanel()} />
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <HeaderButton icon={<MoreVertical />} title="More" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-[200px]">
+          <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">Appearance</DropdownMenuLabel>
+          <DropdownMenuRadioGroup value={theme} onValueChange={(v) => setTheme(v as ThemeMode)}>
+            <DropdownMenuRadioItem value="light"><Sun /> Light</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="dark"><Moon /> Dark</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="auto"><Monitor /> Auto</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuCheckboxItem
+            checked={shortcutEnabled}
+            onCheckedChange={toggleShortcut}
+            onSelect={(e) => e.preventDefault()}
+          >
+            <Keyboard /> Shortcut
+            <DropdownMenuShortcut>⌥Space</DropdownMenuShortcut>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem variant="destructive" onClick={() => window.summonAPI.quit()}>
+            <Power /> Quit Summon
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

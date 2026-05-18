@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from 'react'
-import { ReorderTwo } from '@ricons/ionicons5'
-import { Icon } from './Icon'
+import { GripVertical } from 'lucide-react'
 import { useStore } from './store'
+import { Input } from '@/components/ui/input'
+import { cn } from '@/lib/utils'
 import type { WindowDTO } from './types'
 
 export interface WindowCardHandle {
@@ -28,6 +29,7 @@ export function WindowCard({ window: w, selected, shortcut, onHandle }: WindowCa
     onHandle?.(w.id, handle)
     return () => onHandle?.(w.id, null)
   }, [w.id, onHandle])
+
   const [draft, setDraft] = useState(w.alias)
   const [focused, setFocused] = useState(false)
 
@@ -55,30 +57,49 @@ export function WindowCard({ window: w, selected, shortcut, onHandle }: WindowCa
   }
 
   const isSaved = savedId === w.id
+  const dirName = w.cwd ? w.cwd.split('/').pop() || w.cwd : '(no path)'
 
   return (
     <div
-      className={`relative bg-surface border rounded-[10px] px-4 py-3.5 flex flex-wrap items-center gap-x-3.5 gap-y-2.5 cursor-pointer transition-[background,border-color,transform] duration-150 hover:bg-surface-hover hover:translate-x-0.5 ${selected ? 'border-accent bg-surface-hover' : 'border-border'}`}
+      className={cn(
+        'relative group bg-card text-card-foreground border border-border rounded-lg px-3 py-2 flex items-center gap-2 cursor-pointer transition-colors',
+        'hover:bg-accent/60 hover:border-accent-foreground/10',
+        selected && 'border-ring bg-accent ring-2 ring-ring/30',
+      )}
       onClick={handleClick}
       data-id={w.id}
     >
       <div
-        className="drag-handle flex items-center cursor-grab text-text-muted opacity-0 transition-opacity duration-150 hover:text-text-dim active:cursor-grabbing shrink-0 -ml-1 mr-0.5"
+        className="drag-handle flex items-center cursor-grab text-muted-foreground/60 opacity-30 group-hover:opacity-100 transition-opacity hover:text-foreground active:cursor-grabbing shrink-0 -ml-1"
         onClick={(e) => e.stopPropagation()}
       >
-        <Icon size={14} className="pointer-events-none"><ReorderTwo /></Icon>
+        <GripVertical className="size-4 pointer-events-none" />
       </div>
-      <div className="flex-1 min-w-[200px]">
-        <div className="font-semibold text-[14px] text-text truncate">{w.title || '(untitled)'}</div>
-        <div className="text-[12px] text-text-dim mt-0.5 truncate">
-          {w.cwd && <span>{w.cwd.split('/').pop() || w.cwd}</span>}
-          {w.tabCount > 1 && <span className="text-text-muted ml-1.5">{w.tabCount} tabs</span>}
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <span className="font-medium text-sm truncate leading-tight">{dirName}</span>
+          {w.tabCount > 1 && (
+            <span className="shrink-0 text-[10px] font-medium text-secondary-foreground bg-secondary rounded px-1.5 py-0.5 leading-none">
+              {w.tabCount}
+            </span>
+          )}
+        </div>
+        <div className="text-xs text-muted-foreground mt-0.5 truncate leading-tight">
+          {w.title || '(untitled)'}
         </div>
       </div>
-      <input
+
+      <Input
         ref={inputRef}
         type="text"
-        className={`w-[140px] shrink-0 bg-transparent border rounded-md px-3 py-2 text-[13px] font-medium text-accent outline-none ml-auto text-right transition-[background,border-color,box-shadow,color] duration-200 placeholder:text-text-muted placeholder:opacity-30 placeholder:font-normal hover:bg-bg focus:bg-bg focus:border-accent focus:shadow-[0_0_0_2px_var(--color-accent-dim)] focus:text-text focus:font-normal focus:text-left select-text ${isSaved ? 'border-green shadow-[0_0_0_2px_var(--color-green-dim)]' : 'border-transparent'}`}
+        className={cn(
+          'h-7 w-[96px] shrink-0 text-xs px-2 text-right',
+          'border-transparent bg-transparent shadow-none placeholder:text-muted-foreground/50',
+          'hover:bg-background hover:border-input',
+          'focus-visible:text-left focus-visible:bg-background',
+          isSaved && 'border-emerald-500 ring-2 ring-emerald-500/30',
+        )}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onFocus={() => setFocused(true)}
@@ -88,10 +109,11 @@ export function WindowCard({ window: w, selected, shortcut, onHandle }: WindowCa
         placeholder="alias"
         spellCheck={false}
       />
+
       {shortcut && (
-        <span className="absolute top-1 right-1.5 text-[11px] leading-none text-text-muted opacity-50 font-mono pointer-events-none">
-          {shortcut}
-        </span>
+        <kbd className="shrink-0 text-[10px] font-mono text-muted-foreground/70 bg-muted/60 border border-border rounded px-1.5 py-0.5 leading-none pointer-events-none">
+          ⌘{shortcut}
+        </kbd>
       )}
     </div>
   )

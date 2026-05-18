@@ -4,8 +4,8 @@ export function Footer() {
   const version = useStore((s) => s.version)
 
   return (
-    <div className="mt-6 text-right text-[10px] text-text-muted">
-      {version && <span>{version}</span>}
+    <div className="text-right text-[10px] text-muted-foreground/70 pt-2">
+      {version && <span>v{version}</span>}
     </div>
   )
 }

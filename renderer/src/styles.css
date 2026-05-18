@@ -1,48 +1,91 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
 
-@theme {
-  --color-bg: #f5f5f7;
-  --color-surface: #ffffff;
-  --color-surface-hover: #f0f0f2;
-  --color-border: #d8d8dc;
-  --color-text: #1d1d1f;
-  --color-text-dim: #6e6e78;
-  --color-text-muted: #a0a0a8;
-  --color-accent: #5856d6;
-  --color-accent-dim: rgba(88, 86, 214, 0.1);
-  --color-green: #34c759;
-  --color-green-dim: rgba(52, 199, 89, 0.1);
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.5rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.269 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.371 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 5px);
+  --radius-md: calc(var(--radius) - 3px);
+  --radius-lg: calc(var(--radius) - 1px);
+  --radius-xl: calc(var(--radius) + 2px);
   --font-sans: 'PingFang SC', -apple-system, 'Helvetica Neue', sans-serif;
 }
 
-html.dark {
-  --color-bg: #0c0c0e;
-  --color-surface: #16161a;
-  --color-surface-hover: #1e1e24;
-  --color-border: #2a2a32;
-  --color-text: #e2e2e8;
-  --color-text-dim: #6e6e7a;
-  --color-text-muted: #44444e;
-  --color-accent: #7b6cf6;
-  --color-accent-dim: rgba(123, 108, 246, 0.12);
-  --color-green: #4ade80;
-  --color-green-dim: rgba(74, 222, 128, 0.1);
-}
-
-html {
-  font-size: 15px;
-}
-
-html,
-body,
-#root {
-  background: var(--color-bg);
-  color: var(--color-text);
-  overflow: hidden;
-  height: 100%;
-  transition:
-    background 0.3s,
-    color 0.3s;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html,
+  body,
+  #root {
+    @apply bg-background text-foreground;
+    height: 100%;
+    overflow: hidden;
+    transition:
+      background 0.2s,
+      color 0.2s;
+  }
 }
 
 @keyframes pulse-dot {
@@ -55,17 +98,28 @@ body,
   }
 }
 
-/* Drag handle — visible on card hover */
-[data-id]:hover .drag-handle {
-  opacity: 1;
+/* Slim scrollbar to fit shadcn aesthetic */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
 }
 
 /* SortableJS drag states */
 .sortable-ghost {
   opacity: 0.4;
-  background: var(--color-accent-dim);
-  border-color: var(--color-accent);
-  border-radius: 10px;
+  background: var(--accent);
+  border-color: var(--ring);
+  border-radius: var(--radius);
 }
 
 .sortable-chosen {
@@ -75,5 +129,5 @@ body,
 .sortable-drag {
   opacity: 0.9;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
-  border-radius: 10px;
+  border-radius: var(--radius);
 }

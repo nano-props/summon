@@ -6,6 +6,7 @@ import { calcPlacementX, PANEL_GAP, SCREEN_PADDING } from './placement.ts'
 import type { Placement } from './placement.ts'
 import { refreshWindows, getWindowDtos, saveAlias, reorder } from './window-store.ts'
 import { fadeIn, fadeOut, stopAnimation } from './panel-animator.ts'
+import { loadPrefs, updatePrefs } from './prefs.ts'
 
 const isDev = !app.isPackaged
 
@@ -28,8 +29,8 @@ let refreshTimer: ReturnType<typeof setInterval> | null = null
 function createMainWindow(): BrowserWindow {
   const win = new BrowserWindow({
     type: 'panel',
-    width: 500,
-    height: 700,
+    width: 440,
+    height: 600,
     show: false,
     frame: false,
     hasShadow: true,
@@ -113,6 +114,21 @@ function toggleMainWindow(): void {
   }
 }
 
+// --- Global shortcut ---
+
+const SHORTCUT_ACCELERATOR = 'Option+Space'
+
+function setShortcutEnabled(enabled: boolean): boolean {
+  if (enabled) {
+    if (globalShortcut.isRegistered(SHORTCUT_ACCELERATOR)) return true
+    const ok = globalShortcut.register(SHORTCUT_ACCELERATOR, toggleMainWindow)
+    if (!ok) console.warn(`Failed to register ${SHORTCUT_ACCELERATOR} — may be in use by another app`)
+    return ok
+  }
+  globalShortcut.unregister(SHORTCUT_ACCELERATOR)
+  return true
+}
+
 // --- IPC handlers ---
 
 function validateSender(frame: Electron.WebFrameMain): boolean {
@@ -134,7 +150,7 @@ ipcMain.handle('get-windows', (event) => {
 ipcMain.handle('activate-window', async (event, id: string) => {
   if (!validateSender(event.senderFrame)) return null
   await activateWindow(id)
-  hidePanel()
+  if (!loadPrefs().pinned) hidePanel()
   return { ok: true }
 })
 
@@ -154,13 +170,53 @@ ipcMain.handle('reorder-windows', async (event, orderedIds: string[]) => {
 ipcMain.handle('new-terminal', async (event) => {
   if (!validateSender(event.senderFrame)) return null
   await newTerminal()
-  hidePanel()
+  if (!loadPrefs().pinned) hidePanel()
   return { ok: true }
 })
 
 ipcMain.handle('hide-panel', (event) => {
   if (!validateSender(event.senderFrame)) return null
   hidePanel()
+})
+
+ipcMain.handle('get-prefs', (event) => {
+  if (!validateSender(event.senderFrame)) return null
+  return loadPrefs()
+})
+
+ipcMain.handle('set-pinned', (event, value: boolean) => {
+  if (!validateSender(event.senderFrame)) return null
+  try {
+    updatePrefs({ pinned: !!value })
+    return { ok: true }
+  } catch (e) {
+    console.error('set-pinned failed:', e)
+    return { ok: false }
+  }
+})
+
+ipcMain.handle('set-shortcut-enabled', (event, value: boolean) => {
+  if (!validateSender(event.senderFrame)) return null
+  const enabled = !!value
+  try {
+    updatePrefs({ shortcutEnabled: enabled })
+  } catch (e) {
+    console.error('set-shortcut-enabled failed:', e)
+    return { ok: false }
+  }
+  return { ok: setShortcutEnabled(enabled) }
+})
+
+ipcMain.handle('set-theme', (event, value: 'light' | 'dark' | 'auto') => {
+  if (!validateSender(event.senderFrame)) return null
+  if (value !== 'light' && value !== 'dark' && value !== 'auto') return { ok: false }
+  try {
+    updatePrefs({ theme: value })
+    return { ok: true }
+  } catch (e) {
+    console.error('set-theme failed:', e)
+    return { ok: false }
+  }
 })
 
 ipcMain.handle('quit', (event) => {
@@ -179,10 +235,7 @@ app.whenReady().then(() => {
   tray.setIgnoreDoubleClickEvents(true)
   tray.on('click', toggleMainWindow)
 
-  const registered = globalShortcut.register('Option+Space', toggleMainWindow)
-  if (!registered) {
-    console.warn('Failed to register global shortcut Option+Space — may be in use by another app')
-  }
+  setShortcutEnabled(loadPrefs().shortcutEnabled)
 
   refreshWindows()
   refreshTimer = setInterval(refreshWindows, 2000)

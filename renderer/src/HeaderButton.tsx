@@ -1,15 +1,30 @@
-import type { ReactElement } from 'react'
-import { Icon } from './Icon'
+import * as React from 'react'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
-export function HeaderButton({ icon, title, onClick }: { icon: ReactElement; title: string; onClick: () => void }) {
-  return (
-    <button
-      className="bg-surface border border-border rounded-lg w-9 h-9 flex items-center justify-center cursor-pointer text-text-dim shrink-0 transition-all duration-200 hover:bg-surface-hover hover:text-text"
-      onClick={onClick}
+interface HeaderButtonProps extends Omit<React.ComponentProps<typeof Button>, 'children' | 'variant' | 'size'> {
+  icon: React.ReactElement
+  title: string
+  active?: boolean
+}
+
+export const HeaderButton = React.forwardRef<HTMLButtonElement, HeaderButtonProps>(
+  ({ icon, title, active, className, ...props }, ref) => (
+    <Button
+      ref={ref}
+      variant="ghost"
+      size="icon"
       title={title}
       tabIndex={-1}
+      className={cn(
+        'size-8',
+        active && 'bg-foreground/10 text-foreground hover:bg-foreground/15',
+        className,
+      )}
+      {...props}
     >
-      <Icon size={16}>{icon}</Icon>
-    </button>
-  )
-}
+      {icon}
+    </Button>
+  ),
+)
+HeaderButton.displayName = 'HeaderButton'

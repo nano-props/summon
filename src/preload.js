@@ -8,5 +8,9 @@ contextBridge.exposeInMainWorld('summonAPI', {
   reorderWindows: (orderedIds) => ipcRenderer.invoke('reorder-windows', orderedIds),
   newTerminal: () => ipcRenderer.invoke('new-terminal'),
   hidePanel: () => ipcRenderer.invoke('hide-panel'),
+  getPrefs: () => ipcRenderer.invoke('get-prefs'),
+  setPinned: (value) => ipcRenderer.invoke('set-pinned', value),
+  setShortcutEnabled: (value) => ipcRenderer.invoke('set-shortcut-enabled', value),
+  setTheme: (value) => ipcRenderer.invoke('set-theme', value),
   quit: () => ipcRenderer.invoke('quit'),
 })

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { isEqual, keyBy, compact, debounce } from 'lodash-es'
-import type { WindowDTO } from './types'
+import type { ThemeMode, WindowDTO } from './types'
 
 interface SummonState {
   version: string
@@ -8,12 +8,17 @@ interface SummonState {
   query: string
   selectedIndex: number
   savedId: string | null
-  dark: boolean
+  theme: ThemeMode
+  pinned: boolean
+  shortcutEnabled: boolean
   _lastData: unknown
 
   setQuery: (q: string) => void
   setSelectedIndex: (i: number) => void
-  toggleTheme: () => void
+  setTheme: (mode: ThemeMode) => void
+  togglePin: () => void
+  toggleShortcut: () => void
+  hydrate: () => Promise<void>
   fetchWindows: () => Promise<void>
   activateWindow: (id: string) => Promise<void>
   saveAlias: (id: string, alias: string) => Promise<void>
@@ -22,27 +27,57 @@ interface SummonState {
 
 const clearSavedFeedback = debounce(() => useStore.setState({ savedId: null }), 800)
 
+const systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)')
+
+function applyTheme(mode: ThemeMode) {
+  const isDark = mode === 'dark' || (mode === 'auto' && systemDarkMQ.matches)
+  document.documentElement.classList.toggle('dark', isDark)
+}
+
 export const useStore = create<SummonState>((set, get) => ({
   version: '',
   windows: [],
   query: '',
   selectedIndex: -1,
   savedId: null,
-  dark: (() => {
-    const isDark = localStorage.getItem('theme') === 'dark'
-    document.documentElement.classList.toggle('dark', isDark)
-    return isDark
-  })(),
+  theme: 'auto',
+  pinned: false,
+  shortcutEnabled: true,
   _lastData: null,
 
   setQuery: (q) => set({ query: q, selectedIndex: -1 }),
   setSelectedIndex: (i) => set({ selectedIndex: i }),
 
-  toggleTheme: () => {
-    const next = !get().dark
-    document.documentElement.classList.toggle('dark', next)
-    localStorage.setItem('theme', next ? 'dark' : 'light')
-    set({ dark: next })
+  setTheme: async (mode) => {
+    const prev = get().theme
+    applyTheme(mode)
+    set({ theme: mode })
+    const result = await window.summonAPI.setTheme(mode)
+    if (!result?.ok) {
+      applyTheme(prev)
+      set({ theme: prev })
+    }
+  },
+
+  togglePin: async () => {
+    const next = !get().pinned
+    set({ pinned: next })
+    const result = await window.summonAPI.setPinned(next)
+    if (!result?.ok) set({ pinned: !next })
+  },
+
+  toggleShortcut: async () => {
+    const next = !get().shortcutEnabled
+    set({ shortcutEnabled: next })
+    const result = await window.summonAPI.setShortcutEnabled(next)
+    if (!result?.ok) set({ shortcutEnabled: !next })
+  },
+
+  hydrate: async () => {
+    const prefs = await window.summonAPI.getPrefs()
+    if (!prefs) return
+    applyTheme(prefs.theme)
+    set({ theme: prefs.theme, pinned: prefs.pinned, shortcutEnabled: prefs.shortcutEnabled })
   },
 
   fetchWindows: async () => {
@@ -91,3 +126,7 @@ export const useStore = create<SummonState>((set, get) => ({
     }
   },
 }))
+
+systemDarkMQ.addEventListener('change', () => {
+  if (useStore.getState().theme === 'auto') applyTheme('auto')
+})

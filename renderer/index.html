@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Summon</title>
     <script>
-      if (localStorage.getItem('theme') === 'dark') {
+      // Pre-paint default: follow system. App may override after hydrating prefs.
+      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         document.documentElement.classList.add('dark')
       }
     </script>

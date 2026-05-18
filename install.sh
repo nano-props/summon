@@ -28,6 +28,9 @@ cp -R "dist/mac-arm64/$APP_NAME.app" "$DEST/" 2>/dev/null \
 
 echo "Installed: $DEST/$APP_NAME.app"
 
+echo "Cleaning build artifacts..."
+rm -rf dist dist-renderer
+
 if [ "$WAS_RUNNING" = true ]; then
   echo "Restarting $APP_NAME..."
   open "$DEST/$APP_NAME.app"
