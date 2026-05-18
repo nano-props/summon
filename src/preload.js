@@ -13,5 +13,6 @@ contextBridge.exposeInMainWorld('summonAPI', {
   setShortcutEnabled: (value) => ipcRenderer.invoke('set-shortcut-enabled', value),
   setTheme: (value) => ipcRenderer.invoke('set-theme', value),
   setLanguage: (value) => ipcRenderer.invoke('set-language', value),
+  openGitHub: () => ipcRenderer.invoke('open-github'),
   quit: () => ipcRenderer.invoke('quit'),
 })

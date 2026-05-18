@@ -35,6 +35,7 @@ export interface SummonAPI {
   setShortcutEnabled: (value: boolean) => Promise<{ ok: boolean }>
   setTheme: (value: ThemeMode) => Promise<{ ok: boolean }>
   setLanguage: (value: LanguageMode) => Promise<{ ok: boolean; resolvedLanguage?: Language }>
+  openGitHub: () => Promise<{ ok: boolean }>
   quit: () => Promise<void>
 }
 

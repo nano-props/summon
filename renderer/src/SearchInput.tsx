@@ -17,7 +17,7 @@ export function SearchInput({ inputRef }: { inputRef: React.RefObject<HTMLInputE
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t('search.placeholder')}
-        className={`pl-8 bg-card dark:bg-card ${query ? 'pr-8' : ''} select-text`}
+        className={`pl-8 bg-card dark:bg-card text-[13px] ${query ? 'pr-8' : ''} select-text`}
       />
       {query && (
         <button

@@ -1,3 +1,4 @@
+import { shell } from 'electron'
 import { app, BrowserWindow, Tray, ipcMain, nativeImage, screen, globalShortcut } from 'electron/main'
 import path from 'node:path'
 import { clamp } from 'lodash-es'
@@ -117,6 +118,7 @@ function toggleMainWindow(): void {
 // --- Global shortcut ---
 
 const SHORTCUT_ACCELERATOR = 'Option+Space'
+const GITHUB_URL = 'https://github.com/nano-props/summon'
 
 function setShortcutEnabled(enabled: boolean): boolean {
   if (enabled) {
@@ -234,6 +236,12 @@ ipcMain.handle('set-language', (event, value: 'auto' | 'en' | 'zh' | 'ko' | 'ja'
     console.error('set-language failed:', e)
     return { ok: false }
   }
+})
+
+ipcMain.handle('open-github', async (event) => {
+  if (!validateSender(event.senderFrame)) return null
+  await shell.openExternal(GITHUB_URL)
+  return { ok: true }
 })
 
 ipcMain.handle('quit', (event) => {

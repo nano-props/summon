@@ -34,6 +34,7 @@ i18n.use(initReactI18next).init({
           appearance: 'Appearance',
           language: 'Language',
           shortcut: 'Shortcut',
+          github: 'GitHub',
         },
         language: {
           auto: 'Auto (System)',
@@ -74,6 +75,7 @@ i18n.use(initReactI18next).init({
           appearance: '外观',
           language: '语言',
           shortcut: '快捷键',
+          github: 'GitHub',
         },
         language: {
           auto: '自动（系统）',
@@ -114,6 +116,7 @@ i18n.use(initReactI18next).init({
           appearance: '모양',
           language: '언어',
           shortcut: '단축키',
+          github: 'GitHub',
         },
         language: {
           auto: '자동 (시스템)',
@@ -154,6 +157,7 @@ i18n.use(initReactI18next).init({
           appearance: '外観',
           language: '言語',
           shortcut: 'ショートカット',
+          github: 'GitHub',
         },
         language: {
           auto: '自動（システム）',

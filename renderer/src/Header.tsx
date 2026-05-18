@@ -1,7 +1,7 @@
 import { useStore } from './store'
 import { useTranslation } from 'react-i18next'
 import { languages } from './i18n'
-import { Sun, Moon, Monitor, MoreVertical, Power, ChevronUp, Terminal, Pin, Keyboard } from 'lucide-react'
+import { Sun, Moon, Monitor, MoreVertical, Power, ChevronUp, Terminal, Pin, Keyboard, ExternalLink } from 'lucide-react'
 import { HeaderButton } from './HeaderButton'
 import {
   DropdownMenu,
@@ -77,6 +77,9 @@ export function Header() {
             <Keyboard /> {t('menu.shortcut')}
             <DropdownMenuShortcut>⌥Space</DropdownMenuShortcut>
           </DropdownMenuCheckboxItem>
+          <DropdownMenuItem onClick={() => window.summonAPI.openGitHub()}>
+            <ExternalLink /> {t('menu.github')}
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem variant="destructive" onClick={() => window.summonAPI.quit()}>
             <Power /> {t('actions.quit')}
