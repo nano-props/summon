@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react'
 import { useStore } from './store'
+import { flashItem } from './flash-item'
 import type { WindowCardHandle } from './WindowCard'
 import type { WindowDTO } from './types'
 
@@ -69,6 +70,7 @@ export function useKeyboardNav(
           const idx = SHORTCUT_KEYS.indexOf(key)
           if (idx >= 0 && idx < list.length) {
             e.preventDefault()
+            flashItem(list[idx].id)
             useStore.getState().activateWindow(list[idx].id)
           }
           return
@@ -94,6 +96,7 @@ export function useKeyboardNav(
         if (next < 0) searchRef.current?.focus()
       } else if (e.key === 'Enter') {
         if (selectedIndex >= 0 && selectedIndex < list.length) {
+          flashItem(list[selectedIndex].id)
           activateWindow(list[selectedIndex].id)
         }
       }

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import Sortable from 'sortablejs'
 import { some } from 'lodash-es'
 import { useStore } from './store'
@@ -10,7 +11,14 @@ import { Footer } from './Footer'
 import { useKeyboardNav } from './useKeyboardNav'
 
 export function App() {
-  const { windows, query, selectedIndex, setSelectedIndex, fetchWindows, reorderWindows, hydrate } = useStore()
+  const { t } = useTranslation()
+  const windows = useStore((s) => s.windows)
+  const query = useStore((s) => s.query)
+  const selectedIndex = useStore((s) => s.selectedIndex)
+  const setSelectedIndex = useStore((s) => s.setSelectedIndex)
+  const fetchWindows = useStore((s) => s.fetchWindows)
+  const reorderWindows = useStore((s) => s.reorderWindows)
+  const hydrate = useStore((s) => s.hydrate)
   const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -95,10 +103,13 @@ export function App() {
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-12 px-3 text-muted-foreground text-sm gap-2">
             <LayoutGrid className="size-7 opacity-30" />
-            <div>{windows.length === 0 ? 'No Ghostty windows open' : 'No matching windows'}</div>
+            <div>{windows.length === 0 ? t('empty.noWindows') : t('empty.noMatches')}</div>
           </div>
         ) : (
-          <div ref={listCallbackRef} className="flex flex-col gap-1 px-1 py-1">
+          <div
+            ref={listCallbackRef}
+            className="flex flex-col mx-1 my-1 border border-border rounded-lg overflow-hidden"
+          >
             {filtered.map((w, i) => (
               <WindowCard key={w.id} window={w} selected={i === selectedIndex} onHandle={handleCardRef} />
             ))}

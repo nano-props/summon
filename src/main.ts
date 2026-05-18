@@ -198,13 +198,18 @@ ipcMain.handle('set-pinned', (event, value: boolean) => {
 ipcMain.handle('set-shortcut-enabled', (event, value: boolean) => {
   if (!validateSender(event.senderFrame)) return null
   const enabled = !!value
+  const previous = loadPrefs().shortcutEnabled
+  if (enabled === previous) return { ok: true }
+  const shortcutOk = setShortcutEnabled(enabled)
+  if (!shortcutOk) return { ok: false }
   try {
     updatePrefs({ shortcutEnabled: enabled })
+    return { ok: true }
   } catch (e) {
     console.error('set-shortcut-enabled failed:', e)
+    setShortcutEnabled(previous)
     return { ok: false }
   }
-  return { ok: setShortcutEnabled(enabled) }
 })
 
 ipcMain.handle('set-theme', (event, value: 'light' | 'dark' | 'auto') => {
@@ -215,6 +220,18 @@ ipcMain.handle('set-theme', (event, value: 'light' | 'dark' | 'auto') => {
     return { ok: true }
   } catch (e) {
     console.error('set-theme failed:', e)
+    return { ok: false }
+  }
+})
+
+ipcMain.handle('set-language', (event, value: 'auto' | 'en' | 'zh' | 'ko' | 'ja') => {
+  if (!validateSender(event.senderFrame)) return null
+  if (value !== 'auto' && value !== 'en' && value !== 'zh' && value !== 'ko' && value !== 'ja') return { ok: false }
+  try {
+    const prefs = updatePrefs({ language: value })
+    return { ok: true, resolvedLanguage: prefs.resolvedLanguage }
+  } catch (e) {
+    console.error('set-language failed:', e)
     return { ok: false }
   }
 })

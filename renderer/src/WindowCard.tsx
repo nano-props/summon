@@ -1,6 +1,8 @@
 import { useRef, useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { GripVertical } from 'lucide-react'
 import { useStore } from './store'
+import { pressItem, releaseItem } from './flash-item'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import type { WindowDTO } from './types'
@@ -17,7 +19,10 @@ interface WindowCardProps {
 }
 
 export function WindowCard({ window: w, selected, onHandle }: WindowCardProps) {
-  const { savedId, activateWindow, saveAlias } = useStore()
+  const { t } = useTranslation()
+  const savedId = useStore((s) => s.savedId)
+  const activateWindow = useStore((s) => s.activateWindow)
+  const saveAlias = useStore((s) => s.saveAlias)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -42,6 +47,16 @@ export function WindowCard({ window: w, selected, onHandle }: WindowCardProps) {
     }
   }
 
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if ((e.target as HTMLElement).tagName !== 'INPUT') {
+      pressItem(w.id)
+    }
+  }
+
+  const handlePointerRelease = () => {
+    releaseItem(w.id)
+  }
+
   const handleBlur = () => {
     setFocused(false)
     const alias = draft.trim()
@@ -56,23 +71,29 @@ export function WindowCard({ window: w, selected, onHandle }: WindowCardProps) {
   }
 
   const isSaved = savedId === w.id
-  const dirName = w.cwd ? w.cwd.split('/').pop() || w.cwd : '(no path)'
+  const dirName = w.cwd ? w.cwd.split('/').pop() || w.cwd : t('window.noPath')
   const hasAlias = draft.trim().length > 0
   const showAlias = focused || hasAlias
 
   return (
     <div
       className={cn(
-        'relative group bg-card text-card-foreground border border-border rounded-lg px-3 py-2 flex items-center gap-2 cursor-pointer transition-colors',
-        'hover:bg-accent/60 hover:border-accent-foreground/10',
-        selected && 'border-ring bg-accent ring-2 ring-ring/30',
+        'relative group bg-card text-card-foreground border-b border-border px-3 py-2 flex items-center gap-2 cursor-pointer transition-colors',
+        'hover:bg-accent/60',
+        'first:rounded-t-lg last:rounded-b-lg last:border-b-0',
+        selected && 'bg-accent',
       )}
       onClick={handleClick}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerRelease}
+      onPointerCancel={handlePointerRelease}
+      onPointerLeave={handlePointerRelease}
       data-id={w.id}
     >
       <div
         className="drag-handle flex items-center cursor-grab text-muted-foreground/60 opacity-30 group-hover:opacity-100 transition-opacity hover:text-foreground active:cursor-grabbing shrink-0 -ml-1"
         onClick={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
       >
         <GripVertical className="size-4 pointer-events-none" />
       </div>
@@ -86,7 +107,7 @@ export function WindowCard({ window: w, selected, onHandle }: WindowCardProps) {
             </span>
           )}
         </div>
-        <div className="text-xs text-muted-foreground mt-0.5 truncate leading-tight">{w.title || '(untitled)'}</div>
+        <div className="text-xs text-muted-foreground mt-0.5 truncate leading-tight">{w.title || t('window.untitled')}</div>
       </div>
 
       <Input

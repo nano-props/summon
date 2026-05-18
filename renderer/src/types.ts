@@ -12,11 +12,15 @@ export interface WindowsResponse {
 }
 
 export type ThemeMode = 'light' | 'dark' | 'auto'
+export type Language = 'en' | 'zh' | 'ko' | 'ja'
+export type LanguageMode = 'auto' | Language
 
 export interface Prefs {
   pinned: boolean
   shortcutEnabled: boolean
   theme: ThemeMode
+  language: LanguageMode
+  resolvedLanguage: Language
 }
 
 export interface SummonAPI {
@@ -30,6 +34,7 @@ export interface SummonAPI {
   setPinned: (value: boolean) => Promise<{ ok: boolean }>
   setShortcutEnabled: (value: boolean) => Promise<{ ok: boolean }>
   setTheme: (value: ThemeMode) => Promise<{ ok: boolean }>
+  setLanguage: (value: LanguageMode) => Promise<{ ok: boolean; resolvedLanguage?: Language }>
   quit: () => Promise<void>
 }
 

@@ -12,5 +12,6 @@ contextBridge.exposeInMainWorld('summonAPI', {
   setPinned: (value) => ipcRenderer.invoke('set-pinned', value),
   setShortcutEnabled: (value) => ipcRenderer.invoke('set-shortcut-enabled', value),
   setTheme: (value) => ipcRenderer.invoke('set-theme', value),
+  setLanguage: (value) => ipcRenderer.invoke('set-language', value),
   quit: () => ipcRenderer.invoke('quit'),
 })
