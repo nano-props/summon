@@ -2,11 +2,11 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 import type { Language } from './types'
 
-export const languages: { value: Language; label: string }[] = [
-  { value: 'en', label: 'English' },
-  { value: 'zh', label: '中文' },
-  { value: 'ko', label: '한국어' },
-  { value: 'ja', label: '日本語' },
+export const languages: { value: Language; label: string; flag: string }[] = [
+  { value: 'en', label: 'English', flag: '🇺🇸' },
+  { value: 'zh', label: '中文', flag: '🇨🇳' },
+  { value: 'ko', label: '한국어', flag: '🇰🇷' },
+  { value: 'ja', label: '日本語', flag: '🇯🇵' },
 ]
 
 export const defaultLanguage: Language = 'en'
@@ -36,12 +36,12 @@ i18n.use(initReactI18next).init({
           github: 'GitHub',
         },
         language: {
-          auto: 'Auto (System)',
+          auto: 'System',
         },
         theme: {
           light: 'Light',
           dark: 'Dark',
-          auto: 'Auto (System)',
+          auto: 'System',
         },
         search: {
           placeholder: 'Filter windows...',
@@ -76,12 +76,12 @@ i18n.use(initReactI18next).init({
           github: 'GitHub',
         },
         language: {
-          auto: '自动（系统）',
+          auto: '系统',
         },
         theme: {
           light: '浅色',
           dark: '深色',
-          auto: '自动（系统）',
+          auto: '系统',
         },
         search: {
           placeholder: '过滤窗口...',
@@ -116,12 +116,12 @@ i18n.use(initReactI18next).init({
           github: 'GitHub',
         },
         language: {
-          auto: '자동 (시스템)',
+          auto: '시스템',
         },
         theme: {
           light: '라이트',
           dark: '다크',
-          auto: '자동 (시스템)',
+          auto: '시스템',
         },
         search: {
           placeholder: '창 필터링...',
@@ -156,12 +156,12 @@ i18n.use(initReactI18next).init({
           github: 'GitHub',
         },
         language: {
-          auto: '自動（システム）',
+          auto: 'システム',
         },
         theme: {
           light: 'ライト',
           dark: 'ダーク',
-          auto: '自動（システム）',
+          auto: 'システム',
         },
         search: {
           placeholder: 'ウィンドウを絞り込み...',

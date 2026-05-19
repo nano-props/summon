@@ -1,7 +1,7 @@
 import { useStore } from './store'
 import { useTranslation } from 'react-i18next'
 import { languages } from './i18n'
-import { Sun, Moon, Monitor, MoreVertical, Power, Terminal, Pin, Keyboard, ExternalLink, Globe } from 'lucide-react'
+import { Sun, Moon, Monitor, MoreVertical, Power, Terminal, Pin, Keyboard, ExternalLink } from 'lucide-react'
 import { HeaderButton } from './HeaderButton'
 import {
   DropdownMenu,
@@ -53,9 +53,9 @@ export function Header() {
         <DropdownMenuContent align="end" className="min-w-[200px]">
           <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">{t('menu.appearance')}</DropdownMenuLabel>
           <DropdownMenuRadioGroup value={theme} onValueChange={(v) => setTheme(v as ThemeMode)}>
+            <DropdownMenuRadioItem value="auto"><Monitor /> {t('theme.auto')}</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="light"><Sun /> {t('theme.light')}</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="dark"><Moon /> {t('theme.dark')}</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="auto"><Monitor /> {t('theme.auto')}</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
           <DropdownMenuSeparator />
           <DropdownMenuLabel className="text-muted-foreground text-xs font-normal">{t('menu.language')}</DropdownMenuLabel>
@@ -63,7 +63,7 @@ export function Header() {
             <DropdownMenuRadioItem value="auto"><Monitor /> {t('language.auto')}</DropdownMenuRadioItem>
             {languages.map((lang) => (
               <DropdownMenuRadioItem key={lang.value} value={lang.value}>
-                <Globe /> {lang.label}
+                <span>{lang.flag}</span> {lang.label}
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
