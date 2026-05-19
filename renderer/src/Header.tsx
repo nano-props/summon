@@ -1,7 +1,7 @@
 import { useStore } from './store'
 import { useTranslation } from 'react-i18next'
 import { languages } from './i18n'
-import { Sun, Moon, Monitor, MoreVertical, Power, ChevronUp, Terminal, Pin, Keyboard, ExternalLink } from 'lucide-react'
+import { Sun, Moon, Monitor, MoreVertical, Power, Terminal, Pin, Keyboard, ExternalLink } from 'lucide-react'
 import { HeaderButton } from './HeaderButton'
 import {
   DropdownMenu,
@@ -45,7 +45,6 @@ export function Header() {
         active={pinned}
         onClick={togglePin}
       />
-      <HeaderButton icon={<ChevronUp />} title={t('actions.hide')} onClick={() => window.summonAPI.hidePanel()} />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
