@@ -41,7 +41,7 @@ i18n.use(initReactI18next).init({
         theme: {
           light: 'Light',
           dark: 'Dark',
-          auto: 'Auto',
+          auto: 'Auto (System)',
         },
         search: {
           placeholder: 'Filter windows...',
@@ -81,7 +81,7 @@ i18n.use(initReactI18next).init({
         theme: {
           light: '浅色',
           dark: '深色',
-          auto: '自动',
+          auto: '自动（系统）',
         },
         search: {
           placeholder: '过滤窗口...',
@@ -121,7 +121,7 @@ i18n.use(initReactI18next).init({
         theme: {
           light: '라이트',
           dark: '다크',
-          auto: '자동',
+          auto: '자동 (시스템)',
         },
         search: {
           placeholder: '창 필터링...',
@@ -161,7 +161,7 @@ i18n.use(initReactI18next).init({
         theme: {
           light: 'ライト',
           dark: 'ダーク',
-          auto: '自動',
+          auto: '自動（システム）',
         },
         search: {
           placeholder: 'ウィンドウを絞り込み...',
