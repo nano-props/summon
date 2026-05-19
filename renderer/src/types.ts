@@ -43,4 +43,5 @@ declare global {
   interface Window {
     summonAPI: SummonAPI
   }
+  const __GIT_HASH__: string
 }
