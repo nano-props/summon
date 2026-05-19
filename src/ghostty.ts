@@ -75,10 +75,13 @@ export async function activateWindow(windowId: string): Promise<void> {
 }
 
 export async function newTerminal(): Promise<void> {
+  // No explicit `activate` — Ghostty's `new window` handler already
+  // calls NSApp.activate internally (TerminalController.swift), and
+  // an extra activate makes macOS pull the user to whichever Space
+  // already has a Ghostty window. See ghostty-org/ghostty#11457.
   const script = `
     tell application id "${BUNDLE_ID}"
       new window
-      activate
     end tell
   `
   await runAppleScript(script)
