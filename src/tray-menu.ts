@@ -1,4 +1,4 @@
-import { app, Menu, shell, type MenuItemConstructorOptions } from 'electron'
+import { app, dialog, Menu, shell, type MenuItemConstructorOptions } from 'electron'
 import type { Tray } from 'electron/main'
 import i18next from 'i18next'
 import { execSync } from 'node:child_process'
@@ -59,7 +59,13 @@ function gitCommitHash(): string {
   }
 }
 
-const BUILD_HASH = packageCommitHash() || gitCommitHash()
+function buildHash(): string {
+  const packagedHash = packageCommitHash()
+  if (packagedHash || app.isPackaged) return packagedHash
+  return gitCommitHash()
+}
+
+const BUILD_HASH = buildHash()
 const trayI18n = i18next.createInstance()
 // Tray labels use bundled in-process resources, without an async i18next backend.
 void trayI18n.init({
@@ -92,12 +98,22 @@ export class TrayMenuController {
     this.tray.setContextMenu(this.buildMenu())
   }
 
+  showShortcutRegistrationFailed(accelerator: ShortcutAccelerator): void {
+    const language = loadPrefs().resolvedLanguage
+    void dialog.showMessageBox({
+      type: 'warning',
+      message: trayLabel(language, 'shortcutRegistrationFailed'),
+      detail: trayI18n.t('tray.shortcutRegistrationFailedDetail', { lng: language, accelerator }),
+    })
+  }
+
   private updateShortcut(enabled: boolean, accelerator: ShortcutAccelerator): boolean {
     const previous = loadPrefs()
     if (enabled === previous.shortcutEnabled && accelerator === previous.shortcutAccelerator) return true
     const shortcutOk = setShortcutEnabled(enabled, accelerator, this.options.togglePanel)
     if (!shortcutOk) {
       restoreShortcut(previous, this.options.togglePanel)
+      this.showShortcutRegistrationFailed(accelerator)
       return false
     }
     try {

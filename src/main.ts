@@ -61,7 +61,8 @@ app.whenReady().then(async () => {
   trayMenu.update()
 
   const prefs = loadPrefs()
-  setShortcutEnabled(prefs.shortcutEnabled, prefs.shortcutAccelerator, () => panel.toggle())
+  const shortcutOk = setShortcutEnabled(prefs.shortcutEnabled, prefs.shortcutAccelerator, () => panel.toggle())
+  if (!shortcutOk) trayMenu.showShortcutRegistrationFailed(prefs.shortcutAccelerator)
 
   await refreshWindows()
   refreshTimer = setInterval(refreshWindows, 2000)

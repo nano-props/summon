@@ -1,5 +1,4 @@
 import { BrowserWindow, screen } from 'electron/main'
-import path from 'node:path'
 import { fadeIn, fadeOut, stopAnimation } from '#/src/panel-animator.ts'
 import type { Prefs } from '#/src/prefs.ts'
 
@@ -38,10 +37,12 @@ export class PanelController {
 
   toggle(): void {
     if (!this.mainWindow || this.mainWindow.isDestroyed()) {
-      this.mainWindow = this.createWindow()
-      this.mainWindow.once('ready-to-show', () => {
-        this.positionAtScreenCenter()
-        this.show()
+      const win = this.createWindow()
+      this.mainWindow = win
+      win.once('ready-to-show', () => {
+        if (this.mainWindow !== win || win.isDestroyed()) return
+        this.positionAtScreenCenter(win)
+        this.showWindow(win)
       })
       return
     }
@@ -55,22 +56,30 @@ export class PanelController {
   }
 
   show(): void {
-    if (!this.mainWindow || this.mainWindow.isDestroyed()) return
+    const win = this.mainWindow
+    if (!win || win.isDestroyed()) return
+    this.showWindow(win)
+  }
+
+  private showWindow(win: BrowserWindow): void {
+    if (win.isDestroyed()) return
     this.panelVisible = true
-    this.mainWindow.setOpacity(0)
-    this.mainWindow.setVisibleOnAllWorkspaces(true, WORKSPACE_VISIBILITY_OPTIONS)
-    this.mainWindow.show()
-    this.mainWindow.focus()
+    win.setOpacity(0)
+    win.setVisibleOnAllWorkspaces(true, WORKSPACE_VISIBILITY_OPTIONS)
+    win.show()
+    win.focus()
     this.options.onVisibilityChanged()
-    fadeIn(this.mainWindow)
+    fadeIn(win)
   }
 
   showOrFocus(): void {
     if (!this.mainWindow || this.mainWindow.isDestroyed()) {
-      this.mainWindow = this.createWindow()
-      this.mainWindow.once('ready-to-show', () => {
-        this.positionAtScreenCenter()
-        this.show()
+      const win = this.createWindow()
+      this.mainWindow = win
+      win.once('ready-to-show', () => {
+        if (this.mainWindow !== win || win.isDestroyed()) return
+        this.positionAtScreenCenter(win)
+        this.showWindow(win)
       })
       return
     }
@@ -94,9 +103,13 @@ export class PanelController {
 
   dispose(): void {
     stopAnimation()
+    const wasVisible = this.panelVisible
+    this.panelVisible = false
     if (this.mainWindow && !this.mainWindow.isDestroyed()) {
       this.mainWindow.destroy()
     }
+    this.mainWindow = null
+    if (wasVisible) this.options.onVisibilityChanged()
   }
 
   private createWindow(): BrowserWindow {
@@ -134,18 +147,25 @@ export class PanelController {
       e.preventDefault()
       this.hide()
     })
+    win.on('closed', () => {
+      if (this.mainWindow !== win) return
+      const wasVisible = this.panelVisible
+      this.mainWindow = null
+      this.panelVisible = false
+      if (wasVisible) this.options.onVisibilityChanged()
+    })
 
     return win
   }
 
-  private positionAtScreenCenter(): void {
-    if (!this.mainWindow) return
+  private positionAtScreenCenter(win = this.mainWindow): void {
+    if (!win || win.isDestroyed()) return
     const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
     const workArea = display.workArea
 
     const x = Math.round(workArea.x + (workArea.width - PANEL_WIDTH) / 2)
     const y = Math.round(workArea.y + (workArea.height - PANEL_HEIGHT) / 2)
 
-    this.mainWindow.setPosition(x, y)
+    win.setPosition(x, y)
   }
 }

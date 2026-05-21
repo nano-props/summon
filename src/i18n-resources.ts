@@ -22,6 +22,9 @@ export const i18nResources = {
         language: 'Language',
         shortcut: 'Shortcut',
         shortcutOff: 'Off',
+        shortcutRegistrationFailed: 'Shortcut unavailable',
+        shortcutRegistrationFailedDetail:
+          '{{accelerator}} could not be registered. It may already be in use by macOS or another app.',
         github: 'GitHub',
         version: 'Version',
         build: 'Build',
@@ -51,6 +54,8 @@ export const i18nResources = {
         language: '语言',
         shortcut: '快捷键',
         shortcutOff: '关闭',
+        shortcutRegistrationFailed: '快捷键不可用',
+        shortcutRegistrationFailedDetail: '无法注册 {{accelerator}}，它可能已被 macOS 或其他应用占用。',
         github: 'GitHub',
         version: '版本',
         build: '构建',
@@ -80,6 +85,9 @@ export const i18nResources = {
         language: '언어',
         shortcut: '단축키',
         shortcutOff: '끄기',
+        shortcutRegistrationFailed: '단축키를 사용할 수 없음',
+        shortcutRegistrationFailedDetail:
+          '{{accelerator}}을(를) 등록할 수 없습니다. macOS 또는 다른 앱에서 이미 사용 중일 수 있습니다.',
         github: 'GitHub',
         version: '버전',
         build: '빌드',
@@ -109,6 +117,9 @@ export const i18nResources = {
         language: '言語',
         shortcut: 'ショートカット',
         shortcutOff: 'オフ',
+        shortcutRegistrationFailed: 'ショートカットを使用できません',
+        shortcutRegistrationFailedDetail:
+          '{{accelerator}} を登録できませんでした。macOS または別のアプリが既に使用している可能性があります。',
         github: 'GitHub',
         version: 'バージョン',
         build: 'ビルド',
