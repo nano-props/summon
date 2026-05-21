@@ -7,6 +7,8 @@ const WORKSPACE_VISIBILITY_OPTIONS = {
   visibleOnFullScreen: false,
   skipTransformProcessType: true,
 } as const
+const PANEL_WIDTH = 560
+const PANEL_HEIGHT = 380
 
 interface PanelControllerOptions {
   isDev: boolean
@@ -100,8 +102,8 @@ export class PanelController {
   private createWindow(): BrowserWindow {
     const win = new BrowserWindow({
       type: 'panel',
-      width: 520,
-      height: 340,
+      width: PANEL_WIDTH,
+      height: PANEL_HEIGHT,
       show: false,
       frame: false,
       hasShadow: true,
@@ -138,12 +140,11 @@ export class PanelController {
 
   private positionAtScreenCenter(): void {
     if (!this.mainWindow) return
-    const winBounds = this.mainWindow.getBounds()
     const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
     const workArea = display.workArea
 
-    const x = Math.round(workArea.x + (workArea.width - winBounds.width) / 2)
-    const y = Math.round(workArea.y + (workArea.height - winBounds.height) / 2)
+    const x = Math.round(workArea.x + (workArea.width - PANEL_WIDTH) / 2)
+    const y = Math.round(workArea.y + (workArea.height - PANEL_HEIGHT) / 2)
 
     this.mainWindow.setPosition(x, y)
   }
