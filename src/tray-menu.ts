@@ -1,72 +1,23 @@
-import { Menu, shell, type MenuItemConstructorOptions } from 'electron'
+import { app, Menu, shell, type MenuItemConstructorOptions } from 'electron'
 import type { Tray } from 'electron/main'
+import i18next from 'i18next'
+import { execSync } from 'node:child_process'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import { defaultLanguage, i18nResources } from '#/src/i18n-resources.ts'
 import { loadPrefs, updatePrefs, type Language, type LanguageMode, type Prefs, type ThemeMode } from '#/src/prefs.ts'
 import { SHORTCUT_ACCELERATOR, setShortcutEnabled } from '#/src/shortcut.ts'
 
 const GITHUB_URL = 'https://github.com/nano-props/summon'
 
-const trayLabels: Record<Language, Record<string, string>> = {
-  en: {
-    show: 'Show Summon',
-    hide: 'Hide Summon',
-    newTerminal: 'New Terminal',
-    appearance: 'Appearance',
-    system: 'System',
-    light: 'Light',
-    dark: 'Dark',
-    language: 'Language',
-    shortcut: 'Shortcut',
-    github: 'GitHub',
-    quit: 'Quit Summon',
-  },
-  zh: {
-    show: '显示 Summon',
-    hide: '隐藏 Summon',
-    newTerminal: '新建终端',
-    appearance: '外观',
-    system: '跟随系统',
-    light: '浅色',
-    dark: '深色',
-    language: '语言',
-    shortcut: '快捷键',
-    github: 'GitHub',
-    quit: '退出 Summon',
-  },
-  ko: {
-    show: 'Summon 표시',
-    hide: 'Summon 숨기기',
-    newTerminal: '새 터미널',
-    appearance: '모양',
-    system: '시스템',
-    light: '라이트',
-    dark: '다크',
-    language: '언어',
-    shortcut: '단축키',
-    github: 'GitHub',
-    quit: 'Summon 종료',
-  },
-  ja: {
-    show: 'Summon を表示',
-    hide: 'Summon を隠す',
-    newTerminal: '新しいターミナル',
-    appearance: '外観',
-    system: 'システム',
-    light: 'ライト',
-    dark: 'ダーク',
-    language: '言語',
-    shortcut: 'ショートカット',
-    github: 'GitHub',
-    quit: 'Summon を終了',
-  },
-}
-
-const languageLabels: Record<LanguageMode, string> = {
-  auto: 'System',
+const nativeLanguageLabels: Record<Language, string> = {
   en: 'English',
   zh: '中文',
   ko: '한국어',
   ja: '日本語',
 }
+
+type TrayLabelKey = keyof (typeof i18nResources)[typeof defaultLanguage]['translation']['tray']
 
 interface TrayMenuControllerOptions {
   isPanelVisible: () => boolean
@@ -74,6 +25,43 @@ interface TrayMenuControllerOptions {
   hidePanel: () => void
   newTerminal: () => Promise<void>
   notifyPrefsChanged: (prefs: Prefs) => void
+}
+
+interface PackageMetadata {
+  summonBuild?: {
+    commit?: unknown
+  }
+}
+
+function packageCommitHash(): string {
+  try {
+    const pkg = JSON.parse(readFileSync(path.join(app.getAppPath(), 'package.json'), 'utf8')) as PackageMetadata
+    return typeof pkg.summonBuild?.commit === 'string' ? pkg.summonBuild.commit : ''
+  } catch {
+    return ''
+  }
+}
+
+function gitCommitHash(): string {
+  try {
+    return execSync('git rev-parse --short HEAD', { cwd: app.getAppPath() }).toString().trim()
+  } catch {
+    return ''
+  }
+}
+
+const BUILD_HASH = packageCommitHash() || gitCommitHash()
+const trayI18n = i18next.createInstance()
+// Tray labels use bundled in-process resources, without an async i18next backend.
+void trayI18n.init({
+  lng: defaultLanguage,
+  fallbackLng: defaultLanguage,
+  interpolation: { escapeValue: false },
+  resources: i18nResources,
+})
+
+function trayLabel(language: Language, key: TrayLabelKey): string {
+  return trayI18n.t(`tray.${key}`, { lng: language })
 }
 
 export class TrayMenuController {
@@ -133,16 +121,28 @@ export class TrayMenuController {
     }
   }
 
+  private versionBuildLabel(language: Language): string {
+    return `${trayLabel(language, 'version')} ${app.getVersion()} · ${trayLabel(language, 'build')} ${
+      BUILD_HASH || trayLabel(language, 'unknown')
+    }`
+  }
+
   private buildMenu(): Electron.Menu {
     const prefs = loadPrefs()
-    const label = trayLabels[prefs.resolvedLanguage]
+    const language = prefs.resolvedLanguage
+    const label = (key: TrayLabelKey) => trayLabel(language, key)
     const themeItems: MenuItemConstructorOptions[] = [
-      { label: label.system, type: 'radio', checked: prefs.theme === 'auto', click: () => this.updateTheme('auto') },
-      { label: label.light, type: 'radio', checked: prefs.theme === 'light', click: () => this.updateTheme('light') },
-      { label: label.dark, type: 'radio', checked: prefs.theme === 'dark', click: () => this.updateTheme('dark') },
+      { label: label('system'), type: 'radio', checked: prefs.theme === 'auto', click: () => this.updateTheme('auto') },
+      {
+        label: label('light'),
+        type: 'radio',
+        checked: prefs.theme === 'light',
+        click: () => this.updateTheme('light'),
+      },
+      { label: label('dark'), type: 'radio', checked: prefs.theme === 'dark', click: () => this.updateTheme('dark') },
     ]
     const languageItems: MenuItemConstructorOptions[] = (['auto', 'en', 'zh', 'ko', 'ja'] as const).map((value) => ({
-      label: value === 'auto' ? label.system : languageLabels[value],
+      label: value === 'auto' ? label('system') : nativeLanguageLabels[value],
       type: 'radio',
       checked: prefs.language === value,
       click: () => this.updateLanguage(value),
@@ -150,12 +150,12 @@ export class TrayMenuController {
 
     return Menu.buildFromTemplate([
       {
-        label: this.options.isPanelVisible() ? label.hide : label.show,
+        label: this.options.isPanelVisible() ? label('hide') : label('show'),
         accelerator: SHORTCUT_ACCELERATOR,
         click: this.options.togglePanel,
       },
       {
-        label: label.newTerminal,
+        label: label('newTerminal'),
         accelerator: 'Command+N',
         click: async () => {
           await this.options.newTerminal()
@@ -163,23 +163,28 @@ export class TrayMenuController {
         },
       },
       { type: 'separator' },
-      { label: label.appearance, submenu: themeItems },
-      { label: label.language, submenu: languageItems },
+      { label: label('appearance'), submenu: themeItems },
+      { label: label('language'), submenu: languageItems },
       { type: 'separator' },
       {
-        label: `${label.shortcut} (⌥Space)`,
+        label: `${label('shortcut')} (⌥Space)`,
         type: 'checkbox',
         checked: prefs.shortcutEnabled,
         click: (item) => this.updateShortcutEnabled(item.checked),
       },
       {
-        label: label.github,
+        label: label('github'),
         click: async () => {
           await shell.openExternal(GITHUB_URL)
         },
       },
       { type: 'separator' },
-      { label: label.quit, role: 'quit' },
+      {
+        label: this.versionBuildLabel(language),
+        enabled: false,
+      },
+      { type: 'separator' },
+      { label: label('quit'), role: 'quit' },
     ])
   }
 }

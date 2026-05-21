@@ -1,9 +1,25 @@
 import type { Configuration } from 'electron-builder'
+import { execSync } from 'node:child_process'
+
+function commitHash(): string {
+  try {
+    return execSync('git rev-parse --short HEAD', { cwd: import.meta.dirname })
+      .toString()
+      .trim()
+  } catch {
+    return ''
+  }
+}
 
 const config: Configuration = {
   appId: 'nano.summon',
   productName: 'Summon',
   icon: 'icons/summon.png',
+  extraMetadata: {
+    summonBuild: {
+      commit: commitHash(),
+    },
+  },
   directories: {
     output: 'dist',
   },
