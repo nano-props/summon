@@ -1,4 +1,5 @@
 export interface WindowDTO {
+  key: string
   id: string
   title: string
   cwd: string
@@ -22,8 +23,8 @@ export interface Prefs {
 
 export interface SummonAPI {
   getWindows: () => Promise<WindowsResponse | null>
-  activateWindow: (id: string) => Promise<{ ok: boolean } | null>
-  newTerminal: () => Promise<{ ok: boolean } | null>
+  activateWindow: (id: string) => Promise<{ ok: boolean; error?: string } | null>
+  newTerminal: () => Promise<{ ok: boolean; error?: string } | null>
   hidePanel: () => Promise<{ ok: boolean } | null>
   getPrefs: () => Promise<Prefs | null>
   onPrefsChanged: (callback: (prefs: Prefs) => void) => () => void

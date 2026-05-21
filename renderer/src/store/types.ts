@@ -1,4 +1,4 @@
-import type { Language, LanguageMode, Prefs, ThemeMode, WindowDTO } from '../types'
+import type { Language, LanguageMode, Prefs, ThemeMode, WindowDTO } from '#/renderer/src/types.ts'
 
 export interface UiSlice {
   selectedIndex: number

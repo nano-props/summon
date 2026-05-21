@@ -1,7 +1,7 @@
 import type { StateCreator } from 'zustand'
 import { isEqual } from 'lodash-es'
-import type { SummonState, WindowsSlice } from './types'
-import type { WindowsResponse } from '../types'
+import type { SummonState, WindowsSlice } from '#/renderer/src/store/types.ts'
+import type { WindowsResponse } from '#/renderer/src/types.ts'
 
 let lastData: WindowsResponse | null = null
 
@@ -23,7 +23,8 @@ export const createWindowsSlice: StateCreator<SummonState, [], [], WindowsSlice>
 
     activateWindow: async (id) => {
       try {
-        await window.summonAPI.activateWindow(id)
+        const result = await window.summonAPI.activateWindow(id)
+        if (!result?.ok) console.error('Activate failed:', result?.error ?? 'unknown error')
       } catch (e) {
         console.error('Activate failed:', e)
       }

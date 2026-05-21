@@ -1,9 +1,9 @@
 import { ipcMain } from 'electron/main'
 import { fileURLToPath } from 'node:url'
-import { activateWindow, newTerminal } from './ghostty.ts'
-import type { PanelController } from './panel.ts'
-import { loadPrefs } from './prefs.ts'
-import { getWindowDtos, hasWindowId } from './window-store.ts'
+import { activateWindow, newTerminal } from '#/src/ghostty.ts'
+import type { PanelController } from '#/src/panel.ts'
+import { loadPrefs } from '#/src/prefs.ts'
+import { getWindowDtos, hasWindowId } from '#/src/window-store.ts'
 
 interface RegisterIpcHandlersOptions {
   isDev: boolean
@@ -32,17 +32,28 @@ export function registerIpcHandlers(options: RegisterIpcHandlersOptions): void {
 
   ipcMain.handle('activate-window', async (event, id: string) => {
     if (!validateSender(event.senderFrame)) return null
+    if (typeof id !== 'string') return { ok: false, error: 'Invalid window id' }
     if (!hasWindowId(id)) return { ok: false }
-    await activateWindow(id)
-    options.panel.hide()
-    return { ok: true }
+    try {
+      await activateWindow(id)
+      options.panel.hide()
+      return { ok: true }
+    } catch (e) {
+      console.error('activate-window failed:', e)
+      return { ok: false, error: e instanceof Error ? e.message : String(e) }
+    }
   })
 
   ipcMain.handle('new-terminal', async (event) => {
     if (!validateSender(event.senderFrame)) return null
-    await newTerminal()
-    options.panel.hide()
-    return { ok: true }
+    try {
+      await newTerminal()
+      options.panel.hide()
+      return { ok: true }
+    } catch (e) {
+      console.error('new-terminal failed:', e)
+      return { ok: false, error: e instanceof Error ? e.message : String(e) }
+    }
   })
 
   ipcMain.handle('hide-panel', (event) => {

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
-import { useStore } from './store'
-import { flashItem } from './flash-item'
-import type { WindowDTO } from './types'
+import { flashItem } from '#/renderer/src/flash-item.ts'
+import { useStore } from '#/renderer/src/store.ts'
+import type { WindowDTO } from '#/renderer/src/types.ts'
 
 // ⌘1–⌘9  →  index 0-8
 const SHORTCUT_KEYS = '123456789'
@@ -47,7 +47,7 @@ export function useKeyboardNav(windowsRef: React.RefObject<WindowDTO[]>) {
           const idx = SHORTCUT_KEYS.indexOf(key)
           if (idx >= 0 && idx < list.length) {
             e.preventDefault()
-            flashItem(list[idx].id)
+            flashItem(list[idx].key)
             useStore.getState().activateWindow(list[idx].id)
           }
           return
@@ -87,7 +87,7 @@ export function useKeyboardNav(windowsRef: React.RefObject<WindowDTO[]>) {
         if (closest(e.target, WINDOW_ROW_SELECTOR)) return
         if (selectedIndex >= 0 && selectedIndex < list.length) {
           e.preventDefault()
-          flashItem(list[selectedIndex].id)
+          flashItem(list[selectedIndex].key)
           activateWindow(list[selectedIndex].id)
         }
       }

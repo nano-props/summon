@@ -1,7 +1,7 @@
 import { Menu, shell, type MenuItemConstructorOptions } from 'electron'
 import type { Tray } from 'electron/main'
-import { loadPrefs, updatePrefs, type Language, type LanguageMode, type Prefs, type ThemeMode } from './prefs.ts'
-import { SHORTCUT_ACCELERATOR, setShortcutEnabled } from './shortcut.ts'
+import { loadPrefs, updatePrefs, type Language, type LanguageMode, type Prefs, type ThemeMode } from '#/src/prefs.ts'
+import { SHORTCUT_ACCELERATOR, setShortcutEnabled } from '#/src/shortcut.ts'
 
 const GITHUB_URL = 'https://github.com/nano-props/summon'
 
@@ -80,10 +80,7 @@ export class TrayMenuController {
   private readonly tray: Tray
   private readonly options: TrayMenuControllerOptions
 
-  constructor(
-    tray: Tray,
-    options: TrayMenuControllerOptions,
-  ) {
+  constructor(tray: Tray, options: TrayMenuControllerOptions) {
     this.tray = tray
     this.options = options
   }

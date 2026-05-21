@@ -30,7 +30,9 @@
   --macos-popover: var(--macos-surface-raised);
   --macos-shadow-panel-list: 0 10px 28px rgba(0, 0, 0, 0.12);
   --macos-shadow-status-live: 0 0 8px rgba(52, 199, 89, 0.45);
-  --panel-background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0) 120px), linear-gradient(135deg, #f6f6f8 0%, #ececf0 48%, #f9f9fb 100%);
+  --panel-background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0) 120px),
+    linear-gradient(135deg, #f6f6f8 0%, #ececf0 48%, #f9f9fb 100%);
   --background: var(--macos-surface-base);
   --foreground: var(--macos-label);
   --card: var(--macos-surface-row);
@@ -95,7 +97,9 @@
   --macos-popover: var(--macos-surface-raised);
   --macos-shadow-panel-list: 0 12px 32px rgba(0, 0, 0, 0.34);
   --macos-shadow-status-live: 0 0 8px rgba(48, 209, 88, 0.45);
-  --panel-background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 120px), linear-gradient(135deg, #2c2c2e 0%, #1c1c1e 52%, #171719 100%);
+  --panel-background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 120px),
+    linear-gradient(135deg, #2c2c2e 0%, #1c1c1e 52%, #171719 100%);
   --background: var(--macos-surface-base);
   --foreground: var(--macos-label);
   --card: var(--macos-surface-row);

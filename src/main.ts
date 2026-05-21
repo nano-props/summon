@@ -1,13 +1,13 @@
 import { nativeImage } from 'electron'
 import { app, Tray } from 'electron/main'
 import path from 'node:path'
-import { newTerminal } from './ghostty.ts'
-import { registerIpcHandlers } from './ipc.ts'
-import { PanelController } from './panel.ts'
-import { loadPrefs } from './prefs.ts'
-import { setShortcutEnabled, unregisterShortcuts } from './shortcut.ts'
-import { TrayMenuController } from './tray-menu.ts'
-import { refreshWindows } from './window-store.ts'
+import { newTerminal } from '#/src/ghostty.ts'
+import { registerIpcHandlers } from '#/src/ipc.ts'
+import { PanelController } from '#/src/panel.ts'
+import { loadPrefs } from '#/src/prefs.ts'
+import { setShortcutEnabled, unregisterShortcuts } from '#/src/shortcut.ts'
+import { TrayMenuController } from '#/src/tray-menu.ts'
+import { refreshWindows } from '#/src/window-store.ts'
 
 const isDev = !app.isPackaged
 const DEV_RENDERER_URL = 'http://localhost:5173'
@@ -67,7 +67,7 @@ app.whenReady().then(async () => {
 })
 
 app.on('second-instance', () => {
-  panel.toggle()
+  panel.showOrFocus()
 })
 
 app.on('before-quit', () => {

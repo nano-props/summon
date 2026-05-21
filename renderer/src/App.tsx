@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useStore } from './store'
 import { LayoutGrid } from 'lucide-react'
-import { WindowCard } from './WindowCard'
-import { Header } from './Header'
-import { useKeyboardNav } from './useKeyboardNav'
+import { Header } from '#/renderer/src/Header.tsx'
+import { useStore } from '#/renderer/src/store.ts'
+import { useKeyboardNav } from '#/renderer/src/useKeyboardNav.ts'
+import { WindowCard } from '#/renderer/src/WindowCard.tsx'
 
 export function App() {
   const { t } = useTranslation()
@@ -56,9 +56,7 @@ export function App() {
     child?.scrollIntoView({ block: 'nearest' })
     const active = document.activeElement
     const shouldFocus =
-      !active ||
-      active === document.body ||
-      (active instanceof HTMLElement && active.hasAttribute('data-window-row'))
+      !active || active === document.body || (active instanceof HTMLElement && active.hasAttribute('data-window-row'))
     if (shouldFocus) child?.focus({ preventScroll: true })
   }, [selectedIndex, windows])
 
@@ -74,12 +72,9 @@ export function App() {
             <div className="text-xs text-tertiary-foreground">{t('empty.new-terminal-hint')}</div>
           </div>
         ) : (
-          <div
-            ref={listRef}
-            className="flex flex-col bg-list border-b border-separator overflow-hidden"
-          >
+          <div ref={listRef} className="flex flex-col bg-list border-b border-separator overflow-hidden">
             {windows.map((w, i) => (
-              <WindowCard key={w.id} window={w} index={i} selected={i === selectedIndex} />
+              <WindowCard key={w.key} window={w} index={i} selected={i === selectedIndex} />
             ))}
           </div>
         )}

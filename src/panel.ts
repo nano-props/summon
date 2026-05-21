@@ -1,7 +1,7 @@
 import { BrowserWindow, screen } from 'electron/main'
 import path from 'node:path'
-import { fadeIn, fadeOut, stopAnimation } from './panel-animator.ts'
-import type { Prefs } from './prefs.ts'
+import { fadeIn, fadeOut, stopAnimation } from '#/src/panel-animator.ts'
+import type { Prefs } from '#/src/prefs.ts'
 
 const WORKSPACE_VISIBILITY_OPTIONS = {
   visibleOnFullScreen: false,
@@ -55,11 +55,26 @@ export class PanelController {
   show(): void {
     if (!this.mainWindow || this.mainWindow.isDestroyed()) return
     this.panelVisible = true
+    this.mainWindow.setOpacity(0)
     this.mainWindow.setVisibleOnAllWorkspaces(true, WORKSPACE_VISIBILITY_OPTIONS)
     this.mainWindow.show()
     this.mainWindow.focus()
     this.options.onVisibilityChanged()
     fadeIn(this.mainWindow)
+  }
+
+  showOrFocus(): void {
+    if (!this.mainWindow || this.mainWindow.isDestroyed()) {
+      this.mainWindow = this.createWindow()
+      this.mainWindow.once('ready-to-show', () => {
+        this.positionAtScreenCenter()
+        this.show()
+      })
+      return
+    }
+
+    this.positionAtScreenCenter()
+    this.show()
   }
 
   hide(): void {
@@ -102,6 +117,10 @@ export class PanelController {
       },
     })
     win.setVisibleOnAllWorkspaces(true, WORKSPACE_VISIBILITY_OPTIONS)
+    win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
+    win.webContents.on('will-navigate', (event) => {
+      event.preventDefault()
+    })
 
     if (this.options.isDev) {
       win.loadURL(this.options.devRendererUrl)

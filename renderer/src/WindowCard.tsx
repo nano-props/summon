@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { useStore } from './store'
-import { pressItem, releaseItem } from './flash-item'
-import { cn } from '@/lib/utils'
-import type { WindowDTO } from './types'
+import { pressItem, releaseItem } from '#/renderer/src/flash-item.ts'
+import { cn } from '#/renderer/src/lib/utils.ts'
+import { useStore } from '#/renderer/src/store.ts'
+import type { WindowDTO } from '#/renderer/src/types.ts'
 
 interface WindowCardProps {
   window: WindowDTO
@@ -20,11 +20,11 @@ export function WindowCard({ window: w, index, selected }: WindowCardProps) {
   }
 
   const handlePointerDown = () => {
-    pressItem(w.id)
+    pressItem(w.key)
   }
 
   const handlePointerRelease = () => {
-    releaseItem(w.id)
+    releaseItem(w.key)
   }
 
   const dirName = w.cwd ? w.cwd.split('/').pop() || w.cwd : t('window.no-path')
@@ -45,7 +45,7 @@ export function WindowCard({ window: w, index, selected }: WindowCardProps) {
       onPointerCancel={handlePointerRelease}
       onPointerLeave={handlePointerRelease}
       onFocus={() => setSelectedIndex(index)}
-      data-id={w.id}
+      data-id={w.key}
       data-window-row
       aria-selected={selected}
       tabIndex={selected ? 0 : -1}
@@ -67,7 +67,9 @@ export function WindowCard({ window: w, index, selected }: WindowCardProps) {
             </span>
           )}
         </div>
-        <div className="text-xs text-muted-foreground mt-0.5 truncate leading-tight">{w.title || t('window.untitled')}</div>
+        <div className="text-xs text-muted-foreground mt-0.5 truncate leading-tight">
+          {w.title || t('window.untitled')}
+        </div>
       </div>
     </button>
   )

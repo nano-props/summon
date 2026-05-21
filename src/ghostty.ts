@@ -9,12 +9,12 @@ export interface TerminalWindow {
   tabCount: number
 }
 
-function runAppleScript(script: string, args: string[] = []): Promise<string | null> {
-  return new Promise((resolve) => {
-    execFile('/usr/bin/osascript', ['-e', script, ...args], (error, stdout, stderr) => {
+function runAppleScript(script: string, args: string[] = []): Promise<string> {
+  return new Promise((resolve, reject) => {
+    execFile('/usr/bin/osascript', ['-e', script, ...args], { timeout: 5000 }, (error, stdout, stderr) => {
       if (error) {
-        console.error('AppleScript error:', error.message, stderr)
-        resolve(null)
+        const message = [error.message, stderr.trim()].filter(Boolean).join('\n')
+        reject(new Error(message))
         return
       }
       resolve(stdout)
@@ -67,7 +67,7 @@ export async function activateWindow(windowId: string): Promise<void> {
       set wId to item 1 of argv
       tell application id "${BUNDLE_ID}"
         activate
-        activate window (first window whose id is wId)
+        activate window (window id wId)
       end tell
     end run
   `
@@ -86,4 +86,3 @@ export async function newTerminal(): Promise<void> {
   `
   await runAppleScript(script)
 }
-

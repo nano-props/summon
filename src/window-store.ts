@@ -1,8 +1,9 @@
 import { isEqual } from 'lodash-es'
-import { listWindows } from './ghostty.ts'
-import type { TerminalWindow } from './ghostty.ts'
+import { listWindows } from '#/src/ghostty.ts'
+import type { TerminalWindow } from '#/src/ghostty.ts'
 
 export interface WindowDto {
+  key: string
   id: string
   title: string
   cwd: string
@@ -11,13 +12,15 @@ export interface WindowDto {
 
 let cachedWindows: TerminalWindow[] = []
 let lastSnapshot: TerminalWindow[] | null = null
+let refreshInFlight: Promise<void> | null = null
 
 function cloneWindows(windows: TerminalWindow[]): TerminalWindow[] {
   return windows.map((w) => ({ ...w }))
 }
 
-function toDto(w: TerminalWindow): WindowDto {
+function toDto(w: TerminalWindow, index: number): WindowDto {
   return {
+    key: encodeURIComponent(JSON.stringify([index, w.id, w.title, w.cwd, w.tabCount])),
     id: w.id,
     title: w.title,
     cwd: w.cwd,
@@ -26,16 +29,24 @@ function toDto(w: TerminalWindow): WindowDto {
 }
 
 export async function refreshWindows(): Promise<void> {
-  try {
-    const latest = await listWindows()
-    const snapshot = cloneWindows(latest)
-    if (!isEqual(snapshot, lastSnapshot)) {
-      lastSnapshot = snapshot
-      cachedWindows = cloneWindows(latest)
+  if (refreshInFlight) return refreshInFlight
+
+  refreshInFlight = (async () => {
+    try {
+      const latest = await listWindows()
+      const snapshot = cloneWindows(latest)
+      if (!isEqual(snapshot, lastSnapshot)) {
+        lastSnapshot = snapshot
+        cachedWindows = cloneWindows(latest)
+      }
+    } catch (e) {
+      console.error('Refresh failed:', e instanceof Error ? e.message : e)
+    } finally {
+      refreshInFlight = null
     }
-  } catch (e: any) {
-    console.error('Refresh failed:', e.message)
-  }
+  })()
+
+  return refreshInFlight
 }
 
 export function getWindowDtos(): WindowDto[] {

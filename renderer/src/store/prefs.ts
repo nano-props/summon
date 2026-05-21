@@ -1,8 +1,8 @@
 import type { StateCreator } from 'zustand'
-import { i18n } from '../i18n'
-import { applyTheme } from './theme'
-import type { SummonState, PrefsSlice } from './types'
-import type { Prefs } from '../types'
+import { i18n } from '#/renderer/src/i18n.ts'
+import { applyTheme } from '#/renderer/src/store/theme.ts'
+import type { PrefsSlice, SummonState } from '#/renderer/src/store/types.ts'
+import type { Prefs } from '#/renderer/src/types.ts'
 
 async function applyPrefs(set: (patch: Partial<PrefsSlice>) => void, prefs: Prefs): Promise<void> {
   applyTheme(prefs.theme)
