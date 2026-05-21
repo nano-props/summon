@@ -1,6 +1,7 @@
 import { app } from 'electron/main'
 import { readFileSync, writeFileSync, mkdirSync, renameSync, unlinkSync } from 'node:fs'
 import path from 'node:path'
+import { SHORTCUT_ACCELERATORS, type ShortcutAccelerator } from '#/src/shared/shortcuts.ts'
 
 export type ThemeMode = 'light' | 'dark' | 'auto'
 export type Language = 'en' | 'zh' | 'ko' | 'ja'
@@ -8,6 +9,7 @@ export type LanguageMode = 'auto' | Language
 
 export interface Prefs {
   shortcutEnabled: boolean
+  shortcutAccelerator: ShortcutAccelerator
   theme: ThemeMode
   language: LanguageMode
   resolvedLanguage: Language
@@ -15,12 +17,14 @@ export interface Prefs {
 
 interface StoredPrefs {
   shortcutEnabled: boolean
+  shortcutAccelerator: ShortcutAccelerator
   theme: ThemeMode
   language: LanguageMode
 }
 
 const DEFAULT_PREFS: StoredPrefs = {
   shortcutEnabled: true,
+  shortcutAccelerator: 'Option+Space',
   theme: 'auto',
   language: 'auto',
 }
@@ -49,6 +53,12 @@ function normalizeLanguage(value: unknown): LanguageMode {
     : DEFAULT_PREFS.language
 }
 
+function normalizeShortcutAccelerator(value: unknown): ShortcutAccelerator {
+  return SHORTCUT_ACCELERATORS.includes(value as ShortcutAccelerator)
+    ? (value as ShortcutAccelerator)
+    : DEFAULT_PREFS.shortcutAccelerator
+}
+
 function resolveLanguage(language: LanguageMode): Language {
   return language === 'auto' ? systemLanguage() : language
 }
@@ -57,6 +67,7 @@ function normalizePrefs(parsed: Partial<StoredPrefs>): StoredPrefs {
   return {
     shortcutEnabled:
       typeof parsed.shortcutEnabled === 'boolean' ? parsed.shortcutEnabled : DEFAULT_PREFS.shortcutEnabled,
+    shortcutAccelerator: normalizeShortcutAccelerator(parsed.shortcutAccelerator),
     theme: normalizeTheme(parsed.theme),
     language: normalizeLanguage(parsed.language),
   }

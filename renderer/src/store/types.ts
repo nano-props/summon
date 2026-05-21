@@ -1,4 +1,4 @@
-import type { Language, LanguageMode, Prefs, ThemeMode, WindowDTO } from '#/renderer/src/types.ts'
+import type { Language, LanguageMode, Prefs, ShortcutAccelerator, ThemeMode, WindowDTO } from '#/renderer/src/types.ts'
 
 export interface UiSlice {
   selectedIndex: number
@@ -10,6 +10,7 @@ export interface PrefsSlice {
   language: LanguageMode
   resolvedLanguage: Language
   shortcutEnabled: boolean
+  shortcutAccelerator: ShortcutAccelerator
   hydrate: () => Promise<void>
   syncPrefs: (prefs: Prefs) => Promise<void>
 }

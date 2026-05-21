@@ -12,6 +12,7 @@ async function applyPrefs(set: (patch: Partial<PrefsSlice>) => void, prefs: Pref
     language: prefs.language,
     resolvedLanguage: prefs.resolvedLanguage,
     shortcutEnabled: prefs.shortcutEnabled,
+    shortcutAccelerator: prefs.shortcutAccelerator,
   })
 }
 
@@ -20,6 +21,7 @@ export const createPrefsSlice: StateCreator<SummonState, [], [], PrefsSlice> = (
   language: 'auto',
   resolvedLanguage: 'en',
   shortcutEnabled: true,
+  shortcutAccelerator: 'Option+Space',
 
   hydrate: async () => {
     try {

@@ -1,3 +1,7 @@
+import type { ShortcutAccelerator } from '#/src/shared/shortcuts.ts'
+
+export type { ShortcutAccelerator } from '#/src/shared/shortcuts.ts'
+
 export interface WindowDTO {
   key: string
   id: string
@@ -17,6 +21,7 @@ export type LanguageMode = 'auto' | Language
 
 export interface Prefs {
   shortcutEnabled: boolean
+  shortcutAccelerator: ShortcutAccelerator
   theme: ThemeMode
   language: LanguageMode
   resolvedLanguage: Language

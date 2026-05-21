@@ -1,18 +1,21 @@
 import { globalShortcut } from 'electron/main'
+import type { ShortcutAccelerator } from '#/src/shared/shortcuts.ts'
 
-export const SHORTCUT_ACCELERATOR = 'Option+Space'
+let registeredAccelerator: ShortcutAccelerator | null = null
 
-export function setShortcutEnabled(enabled: boolean, action: () => void): boolean {
-  if (enabled) {
-    if (globalShortcut.isRegistered(SHORTCUT_ACCELERATOR)) return true
-    const ok = globalShortcut.register(SHORTCUT_ACCELERATOR, action)
-    if (!ok) console.warn(`Failed to register ${SHORTCUT_ACCELERATOR} — may be in use by another app`)
-    return ok
+export function setShortcutEnabled(enabled: boolean, accelerator: ShortcutAccelerator, action: () => void): boolean {
+  if (registeredAccelerator) {
+    globalShortcut.unregister(registeredAccelerator)
+    registeredAccelerator = null
   }
-  globalShortcut.unregister(SHORTCUT_ACCELERATOR)
-  return true
+  if (!enabled) return true
+  const ok = globalShortcut.register(accelerator, action)
+  if (!ok) console.warn(`Failed to register ${accelerator} — may be in use by another app`)
+  if (ok) registeredAccelerator = accelerator
+  return ok
 }
 
 export function unregisterShortcuts(): void {
   globalShortcut.unregisterAll()
+  registeredAccelerator = null
 }

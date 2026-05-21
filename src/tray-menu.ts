@@ -6,7 +6,8 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { defaultLanguage, i18nResources } from '#/src/i18n-resources.ts'
 import { loadPrefs, updatePrefs, type Language, type LanguageMode, type Prefs, type ThemeMode } from '#/src/prefs.ts'
-import { SHORTCUT_ACCELERATOR, setShortcutEnabled } from '#/src/shortcut.ts'
+import { setShortcutEnabled } from '#/src/shortcut.ts'
+import { SHORTCUT_ACCELERATORS, type ShortcutAccelerator } from '#/src/shared/shortcuts.ts'
 
 const GITHUB_URL = 'https://github.com/nano-props/summon'
 
@@ -15,6 +16,14 @@ const nativeLanguageLabels: Record<Language, string> = {
   zh: '中文',
   ko: '한국어',
   ja: '日本語',
+}
+
+const shortcutLabels: Record<ShortcutAccelerator, string> = {
+  'Option+Space': '⌥ Space',
+  'Option+Tab': '⌥ Tab',
+  'Command+Shift+Space': '⌘ ⇧ Space',
+  'Control+Space': '⌃ Space',
+  'Command+Space': '⌘ Space',
 }
 
 type TrayLabelKey = keyof (typeof i18nResources)[typeof defaultLanguage]['translation']['tray']
@@ -64,6 +73,11 @@ function trayLabel(language: Language, key: TrayLabelKey): string {
   return trayI18n.t(`tray.${key}`, { lng: language })
 }
 
+function restoreShortcut(prefs: Prefs, action: () => void): void {
+  const restored = setShortcutEnabled(prefs.shortcutEnabled, prefs.shortcutAccelerator, action)
+  if (!restored) console.warn(`Failed to restore ${prefs.shortcutAccelerator}`)
+}
+
 export class TrayMenuController {
   private readonly tray: Tray
   private readonly options: TrayMenuControllerOptions
@@ -78,19 +92,22 @@ export class TrayMenuController {
     this.tray.setContextMenu(this.buildMenu())
   }
 
-  private updateShortcutEnabled(enabled: boolean): boolean {
-    const previous = loadPrefs().shortcutEnabled
-    if (enabled === previous) return true
-    const shortcutOk = setShortcutEnabled(enabled, this.options.togglePanel)
-    if (!shortcutOk) return false
+  private updateShortcut(enabled: boolean, accelerator: ShortcutAccelerator): boolean {
+    const previous = loadPrefs()
+    if (enabled === previous.shortcutEnabled && accelerator === previous.shortcutAccelerator) return true
+    const shortcutOk = setShortcutEnabled(enabled, accelerator, this.options.togglePanel)
+    if (!shortcutOk) {
+      restoreShortcut(previous, this.options.togglePanel)
+      return false
+    }
     try {
-      const prefs = updatePrefs({ shortcutEnabled: enabled })
+      const prefs = updatePrefs({ shortcutEnabled: enabled, shortcutAccelerator: accelerator })
       this.options.notifyPrefsChanged(prefs)
       this.update()
       return true
     } catch (e) {
-      console.error('set-shortcut-enabled failed:', e)
-      setShortcutEnabled(previous, this.options.togglePanel)
+      console.error('set-shortcut failed:', e)
+      restoreShortcut(previous, this.options.togglePanel)
       return false
     }
   }
@@ -147,11 +164,26 @@ export class TrayMenuController {
       checked: prefs.language === value,
       click: () => this.updateLanguage(value),
     }))
+    const shortcutItems: MenuItemConstructorOptions[] = [
+      ...SHORTCUT_ACCELERATORS.map((value) => ({
+        label: shortcutLabels[value],
+        type: 'radio' as const,
+        checked: prefs.shortcutEnabled && prefs.shortcutAccelerator === value,
+        click: () => this.updateShortcut(true, value),
+      })),
+      { type: 'separator' as const },
+      {
+        label: label('shortcutOff'),
+        type: 'radio',
+        checked: !prefs.shortcutEnabled,
+        click: () => this.updateShortcut(false, prefs.shortcutAccelerator),
+      },
+    ]
 
     return Menu.buildFromTemplate([
       {
         label: this.options.isPanelVisible() ? label('hide') : label('show'),
-        accelerator: SHORTCUT_ACCELERATOR,
+        accelerator: prefs.shortcutEnabled ? prefs.shortcutAccelerator : undefined,
         click: this.options.togglePanel,
       },
       {
@@ -166,12 +198,7 @@ export class TrayMenuController {
       { label: label('appearance'), submenu: themeItems },
       { label: label('language'), submenu: languageItems },
       { type: 'separator' },
-      {
-        label: `${label('shortcut')} (⌥Space)`,
-        type: 'checkbox',
-        checked: prefs.shortcutEnabled,
-        click: (item) => this.updateShortcutEnabled(item.checked),
-      },
+      { label: label('shortcut'), submenu: shortcutItems },
       {
         label: label('github'),
         click: async () => {
