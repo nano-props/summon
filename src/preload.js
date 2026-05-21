@@ -4,15 +4,12 @@ const { contextBridge, ipcRenderer } = require('electron/renderer')
 contextBridge.exposeInMainWorld('summonAPI', {
   getWindows: () => ipcRenderer.invoke('get-windows'),
   activateWindow: (id) => ipcRenderer.invoke('activate-window', id),
-  saveAlias: (id, alias) => ipcRenderer.invoke('save-alias', id, alias),
-  reorderWindows: (orderedIds) => ipcRenderer.invoke('reorder-windows', orderedIds),
   newTerminal: () => ipcRenderer.invoke('new-terminal'),
   hidePanel: () => ipcRenderer.invoke('hide-panel'),
   getPrefs: () => ipcRenderer.invoke('get-prefs'),
-  setPinned: (value) => ipcRenderer.invoke('set-pinned', value),
-  setShortcutEnabled: (value) => ipcRenderer.invoke('set-shortcut-enabled', value),
-  setTheme: (value) => ipcRenderer.invoke('set-theme', value),
-  setLanguage: (value) => ipcRenderer.invoke('set-language', value),
-  openGitHub: () => ipcRenderer.invoke('open-github'),
-  quit: () => ipcRenderer.invoke('quit'),
+  onPrefsChanged: (callback) => {
+    const listener = (_event, prefs) => callback(prefs)
+    ipcRenderer.on('prefs-changed', listener)
+    return () => ipcRenderer.removeListener('prefs-changed', listener)
+  },
 })

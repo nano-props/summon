@@ -7,7 +7,6 @@ export type Language = 'en' | 'zh' | 'ko' | 'ja'
 export type LanguageMode = 'auto' | Language
 
 export interface Prefs {
-  pinned: boolean
   shortcutEnabled: boolean
   theme: ThemeMode
   language: LanguageMode
@@ -15,14 +14,12 @@ export interface Prefs {
 }
 
 interface StoredPrefs {
-  pinned: boolean
   shortcutEnabled: boolean
   theme: ThemeMode
   language: LanguageMode
 }
 
 const DEFAULT_PREFS: StoredPrefs = {
-  pinned: false,
   shortcutEnabled: true,
   theme: 'auto',
   language: 'auto',
@@ -58,7 +55,6 @@ function resolveLanguage(language: LanguageMode): Language {
 
 function normalizePrefs(parsed: Partial<StoredPrefs>): StoredPrefs {
   return {
-    pinned: typeof parsed.pinned === 'boolean' ? parsed.pinned : DEFAULT_PREFS.pinned,
     shortcutEnabled:
       typeof parsed.shortcutEnabled === 'boolean' ? parsed.shortcutEnabled : DEFAULT_PREFS.shortcutEnabled,
     theme: normalizeTheme(parsed.theme),

@@ -1,72 +1,49 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect } from 'react'
 import { useStore } from './store'
 import { flashItem } from './flash-item'
-import type { WindowCardHandle } from './WindowCard'
 import type { WindowDTO } from './types'
 
 // ⌘1–⌘9  →  index 0-8
 const SHORTCUT_KEYS = '123456789'
+const WINDOW_ROW_SELECTOR = '[data-window-row]'
+const INTERACTIVE_SELECTOR = [
+  WINDOW_ROW_SELECTOR,
+  'button',
+  'a[href]',
+  'input',
+  'select',
+  'textarea',
+  '[contenteditable="true"]',
+  '[role="button"]',
+].join(',')
 
-export function useKeyboardNav(
-  searchRef: React.RefObject<HTMLInputElement | null>,
-  filteredRef: React.RefObject<WindowDTO[]>,
-) {
-  const cardRefs = useRef(new Map<string, WindowCardHandle>())
+function closest(target: EventTarget | null, selector: string) {
+  return target instanceof HTMLElement ? target.closest(selector) : null
+}
 
-  const handleCardRef = useCallback((id: string, handle: WindowCardHandle | null) => {
-    if (handle) cardRefs.current.set(id, handle)
-    else cardRefs.current.delete(id)
-  }, [])
+function moveIndex(selectedIndex: number, length: number, delta: number) {
+  if (length === 0) return -1
+  if (selectedIndex < 0) return delta > 0 ? 0 : length - 1
+  return (selectedIndex + delta + length) % length
+}
 
+export function useKeyboardNav(windowsRef: React.RefObject<WindowDTO[]>) {
   useEffect(() => {
     const onFocus = () => {
-      useStore.getState().setSelectedIndex(-1)
-      searchRef.current?.focus()
+      const list = windowsRef.current!
+      useStore.getState().setSelectedIndex(list.length > 0 ? 0 : -1)
+      window.requestAnimationFrame(() => {
+        document.querySelector<HTMLElement>(WINDOW_ROW_SELECTOR)?.focus({ preventScroll: true })
+      })
     }
     const onKeyDown = (e: KeyboardEvent) => {
-      const inAliasInput = (e.target as HTMLElement).tagName === 'INPUT' && e.target !== searchRef.current
-
-      // Tab: cycle through alias inputs (works from anywhere)
-      if (e.key === 'Tab') {
-        e.preventDefault()
-        const list = filteredRef.current!
-        if (list.length === 0) return
-        const { selectedIndex, setSelectedIndex } = useStore.getState()
-        const refs = cardRefs.current
-
-        let current = selectedIndex
-        if (inAliasInput) {
-          const idx = list.findIndex((w) => refs.get(w.id)?.isInputFocused())
-          if (idx >= 0) current = idx
-        }
-
-        // In alias → move to next/prev; otherwise → enter edit mode on current (or first/last)
-        let next: number
-        if (inAliasInput) {
-          next = current + (e.shiftKey ? -1 : 1)
-        } else if (current >= 0) {
-          next = current
-        } else {
-          next = e.shiftKey ? list.length - 1 : 0
-        }
-
-        if (next >= 0 && next < list.length) {
-          setSelectedIndex(next)
-          refs.get(list[next].id)?.focusInput()
-        } else {
-          // Past either end → back to search
-          setSelectedIndex(-1)
-          searchRef.current?.focus()
-        }
-        return
-      }
+      if (e.defaultPrevented) return
 
       // ⌘+digit quick activate
-      // In alias input: only ⌘1-⌘9 to avoid blocking ⌘A/C/V/X/Z
       if (e.metaKey && !e.ctrlKey && !e.altKey) {
         const key = e.key.toLowerCase()
         if (SHORTCUT_KEYS.includes(key)) {
-          const list = filteredRef.current!
+          const list = windowsRef.current!
           const idx = SHORTCUT_KEYS.indexOf(key)
           if (idx >= 0 && idx < list.length) {
             e.preventDefault()
@@ -75,27 +52,41 @@ export function useKeyboardNav(
           }
           return
         }
+        if (key === 'n') {
+          e.preventDefault()
+          window.summonAPI.newTerminal()
+          return
+        }
       }
-
-      // Other keys: don't intercept when alias input is focused
-      if (inAliasInput) return
 
       if (e.key === 'Escape') {
         window.summonAPI.hidePanel()
         return
       }
+
+      if (closest(e.target, INTERACTIVE_SELECTOR) && !closest(e.target, WINDOW_ROW_SELECTOR)) return
+
       const { selectedIndex, setSelectedIndex, activateWindow } = useStore.getState()
-      const list = filteredRef.current!
+      const list = windowsRef.current!
       if (e.key === 'ArrowDown') {
         e.preventDefault()
-        setSelectedIndex(Math.min(selectedIndex + 1, list.length - 1))
+        setSelectedIndex(moveIndex(selectedIndex, list.length, 1))
       } else if (e.key === 'ArrowUp') {
         e.preventDefault()
-        const next = selectedIndex - 1
-        setSelectedIndex(Math.max(next, -1))
-        if (next < 0) searchRef.current?.focus()
-      } else if (e.key === 'Enter') {
+        setSelectedIndex(moveIndex(selectedIndex, list.length, -1))
+      } else if (e.key === 'Tab') {
+        e.preventDefault()
+        setSelectedIndex(moveIndex(selectedIndex, list.length, e.shiftKey ? -1 : 1))
+      } else if (e.key === 'Home') {
+        e.preventDefault()
+        if (list.length > 0) setSelectedIndex(0)
+      } else if (e.key === 'End') {
+        e.preventDefault()
+        if (list.length > 0) setSelectedIndex(list.length - 1)
+      } else if (e.key === 'Enter' || e.key === ' ') {
+        if (closest(e.target, WINDOW_ROW_SELECTOR)) return
         if (selectedIndex >= 0 && selectedIndex < list.length) {
+          e.preventDefault()
           flashItem(list[selectedIndex].id)
           activateWindow(list[selectedIndex].id)
         }
@@ -107,7 +98,5 @@ export function useKeyboardNav(
       window.removeEventListener('focus', onFocus)
       window.removeEventListener('keydown', onKeyDown)
     }
-  }, [searchRef, filteredRef])
-
-  return handleCardRef
+  }, [windowsRef])
 }
