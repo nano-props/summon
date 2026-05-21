@@ -48,7 +48,7 @@ export function useKeyboardNav(windowsRef: React.RefObject<WindowDTO[]>) {
           if (idx >= 0 && idx < list.length) {
             e.preventDefault()
             flashItem(list[idx].key)
-            useStore.getState().activateWindow(list[idx].id)
+            useStore.getState().activateWindow(list[idx])
           }
           return
         }
@@ -88,7 +88,7 @@ export function useKeyboardNav(windowsRef: React.RefObject<WindowDTO[]>) {
         if (selectedIndex >= 0 && selectedIndex < list.length) {
           e.preventDefault()
           flashItem(list[selectedIndex].key)
-          activateWindow(list[selectedIndex].id)
+          activateWindow(list[selectedIndex])
         }
       }
     }

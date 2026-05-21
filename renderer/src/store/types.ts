@@ -17,7 +17,7 @@ export interface PrefsSlice {
 export interface WindowsSlice {
   windows: WindowDTO[]
   fetchWindows: () => Promise<void>
-  activateWindow: (id: string) => Promise<void>
+  activateWindow: (window: WindowDTO) => Promise<void>
 }
 
 export type SummonState = UiSlice & PrefsSlice & WindowsSlice

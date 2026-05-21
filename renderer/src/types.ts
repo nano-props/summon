@@ -1,6 +1,7 @@
 export interface WindowDTO {
   key: string
   id: string
+  terminalId: string
   title: string
   cwd: string
   tabCount: number
@@ -23,7 +24,7 @@ export interface Prefs {
 
 export interface SummonAPI {
   getWindows: () => Promise<WindowsResponse | null>
-  activateWindow: (id: string) => Promise<{ ok: boolean; error?: string } | null>
+  activateWindow: (id: string, terminalId: string) => Promise<{ ok: boolean; error?: string } | null>
   newTerminal: () => Promise<{ ok: boolean; error?: string } | null>
   hidePanel: () => Promise<{ ok: boolean } | null>
   getPrefs: () => Promise<Prefs | null>

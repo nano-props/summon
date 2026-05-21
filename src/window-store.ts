@@ -5,6 +5,7 @@ import type { TerminalWindow } from '#/src/ghostty.ts'
 export interface WindowDto {
   key: string
   id: string
+  terminalId: string
   title: string
   cwd: string
   tabCount: number
@@ -20,8 +21,9 @@ function cloneWindows(windows: TerminalWindow[]): TerminalWindow[] {
 
 function toDto(w: TerminalWindow, index: number): WindowDto {
   return {
-    key: encodeURIComponent(JSON.stringify([index, w.id, w.title, w.cwd, w.tabCount])),
+    key: encodeURIComponent(JSON.stringify([index, w.id, w.terminalId, w.title, w.cwd, w.tabCount])),
     id: w.id,
+    terminalId: w.terminalId,
     title: w.title,
     cwd: w.cwd,
     tabCount: w.tabCount,

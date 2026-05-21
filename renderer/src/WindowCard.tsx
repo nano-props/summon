@@ -16,7 +16,7 @@ export function WindowCard({ window: w, index, selected }: WindowCardProps) {
   const setSelectedIndex = useStore((s) => s.setSelectedIndex)
 
   const handleClick = () => {
-    activateWindow(w.id)
+    activateWindow(w)
   }
 
   const handlePointerDown = () => {

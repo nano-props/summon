@@ -30,12 +30,13 @@ export function registerIpcHandlers(options: RegisterIpcHandlersOptions): void {
     return { windows: getWindowDtos() }
   })
 
-  ipcMain.handle('activate-window', async (event, id: string) => {
+  ipcMain.handle('activate-window', async (event, id: string, terminalId = '') => {
     if (!validateSender(event.senderFrame)) return null
     if (typeof id !== 'string') return { ok: false, error: 'Invalid window id' }
+    if (typeof terminalId !== 'string') return { ok: false, error: 'Invalid terminal id' }
     if (!hasWindowId(id)) return { ok: false }
     try {
-      await activateWindow(id)
+      await activateWindow(id, terminalId)
       options.panel.hide()
       return { ok: true }
     } catch (e) {

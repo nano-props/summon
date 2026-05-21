@@ -3,7 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron/renderer')
 
 contextBridge.exposeInMainWorld('summonAPI', {
   getWindows: () => ipcRenderer.invoke('get-windows'),
-  activateWindow: (id) => ipcRenderer.invoke('activate-window', id),
+  activateWindow: (id, terminalId) => ipcRenderer.invoke('activate-window', id, terminalId),
   newTerminal: () => ipcRenderer.invoke('new-terminal'),
   hidePanel: () => ipcRenderer.invoke('hide-panel'),
   getPrefs: () => ipcRenderer.invoke('get-prefs'),

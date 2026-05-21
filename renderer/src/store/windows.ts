@@ -21,9 +21,9 @@ export const createWindowsSlice: StateCreator<SummonState, [], [], WindowsSlice>
       }
     },
 
-    activateWindow: async (id) => {
+    activateWindow: async (window) => {
       try {
-        const result = await window.summonAPI.activateWindow(id)
+        const result = await globalThis.window.summonAPI.activateWindow(window.id, window.terminalId)
         if (!result?.ok) console.error('Activate failed:', result?.error ?? 'unknown error')
       } catch (e) {
         console.error('Activate failed:', e)
