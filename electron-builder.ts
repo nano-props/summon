@@ -1,11 +1,9 @@
 import type { Configuration } from 'electron-builder'
-import { execSync } from 'node:child_process'
+import { execaSync } from 'execa'
 
 function commitHash(): string {
   try {
-    return execSync('git rev-parse --short HEAD', { cwd: import.meta.dirname })
-      .toString()
-      .trim()
+    return execaSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: import.meta.dirname }).stdout.trim()
   } catch {
     return ''
   }

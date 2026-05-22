@@ -2,13 +2,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'node:path'
-import { execSync } from 'node:child_process'
+import { execaSync } from 'execa'
 
 function commitHash(): string {
   try {
-    return execSync('git rev-parse --short HEAD', { cwd: import.meta.dirname })
-      .toString()
-      .trim()
+    return execaSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: import.meta.dirname }).stdout.trim()
   } catch {
     return ''
   }

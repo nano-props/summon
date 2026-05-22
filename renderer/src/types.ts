@@ -9,6 +9,11 @@ export interface WindowDTO {
   title: string
   cwd: string
   tabCount: number
+  gitRepo: {
+    root: string
+    rootName: string
+    isRoot: boolean
+  } | null
 }
 
 export interface WindowsResponse {

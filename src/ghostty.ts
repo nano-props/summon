@@ -1,4 +1,4 @@
-import { execFile } from 'node:child_process'
+import { execa } from 'execa'
 
 const BUNDLE_ID = 'com.mitchellh.ghostty'
 
@@ -12,17 +12,9 @@ export interface TerminalWindow {
 
 const FIELD_SEPARATOR = '\u001f'
 
-function runAppleScript(script: string, args: string[] = []): Promise<string> {
-  return new Promise((resolve, reject) => {
-    execFile('/usr/bin/osascript', ['-e', script, ...args], { timeout: 5000 }, (error, stdout, stderr) => {
-      if (error) {
-        const message = [error.message, stderr.trim()].filter(Boolean).join('\n')
-        reject(new Error(message))
-        return
-      }
-      resolve(stdout)
-    })
-  })
+async function runAppleScript(script: string, args: string[] = []): Promise<string> {
+  const { stdout } = await execa('/usr/bin/osascript', ['-e', script, ...args], { timeout: 5000 })
+  return stdout
 }
 
 export async function listWindows(): Promise<TerminalWindow[]> {

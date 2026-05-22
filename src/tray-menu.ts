@@ -1,7 +1,7 @@
 import { app, dialog, Menu, shell, type MenuItemConstructorOptions } from 'electron'
 import type { Tray } from 'electron/main'
+import { execaSync } from 'execa'
 import i18next from 'i18next'
-import { execSync } from 'node:child_process'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { defaultLanguage, i18nResources } from '#/src/i18n-resources.ts'
@@ -53,7 +53,7 @@ function packageCommitHash(): string {
 
 function gitCommitHash(): string {
   try {
-    return execSync('git rev-parse --short HEAD', { cwd: app.getAppPath() }).toString().trim()
+    return execaSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: app.getAppPath() }).stdout.trim()
   } catch {
     return ''
   }

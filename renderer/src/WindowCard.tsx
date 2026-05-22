@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { GitBranch } from 'lucide-react'
 import { pressItem, releaseItem } from '#/renderer/src/flash-item.ts'
 import { cn } from '#/renderer/src/lib/utils.ts'
 import { useStore } from '#/renderer/src/store.ts'
@@ -29,6 +30,7 @@ export function WindowCard({ window: w, index, selected }: WindowCardProps) {
 
   const dirName = w.cwd ? w.cwd.split('/').pop() || w.cwd : t('window.no-path')
   const shortcut = index < 9 ? `⌘${index + 1}` : `${index + 1}`
+  const gitLabel = w.gitRepo && !w.gitRepo.isRoot ? w.gitRepo.rootName : null
 
   return (
     <button
@@ -61,6 +63,15 @@ export function WindowCard({ window: w, index, selected }: WindowCardProps) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5 min-w-0">
           <span className="font-medium text-sm truncate leading-tight">{dirName}</span>
+          {w.gitRepo && (
+            <span
+              className="shrink min-w-0 inline-flex items-center gap-1 text-[10px] font-medium text-tertiary-foreground bg-secondary rounded px-1.5 py-0.5 leading-none"
+              title={w.gitRepo.root}
+            >
+              <GitBranch className="size-3 shrink-0" aria-hidden="true" />
+              {gitLabel && <span className="truncate">{gitLabel}</span>}
+            </span>
+          )}
           {w.tabCount > 1 && (
             <span className="shrink-0 text-[10px] font-medium text-secondary-foreground bg-secondary rounded px-1.5 py-0.5 leading-none">
               {w.tabCount}

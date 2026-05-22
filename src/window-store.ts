@@ -1,4 +1,5 @@
 import { isEqual } from 'lodash-es'
+import { gitRepoInfo, type GitRepoInfo } from '#/src/git.ts'
 import { listWindows } from '#/src/ghostty.ts'
 import type { TerminalWindow } from '#/src/ghostty.ts'
 
@@ -9,17 +10,26 @@ export interface WindowDto {
   title: string
   cwd: string
   tabCount: number
+  gitRepo: GitRepoInfo | null
 }
 
-let cachedWindows: TerminalWindow[] = []
-let lastSnapshot: TerminalWindow[] | null = null
+interface CachedWindow extends TerminalWindow {
+  gitRepo: GitRepoInfo | null
+}
+
+let cachedWindows: CachedWindow[] = []
+let lastSnapshot: CachedWindow[] | null = null
 let refreshInFlight: Promise<void> | null = null
 
-function cloneWindows(windows: TerminalWindow[]): TerminalWindow[] {
-  return windows.map((w) => ({ ...w }))
+function cloneWindows(windows: CachedWindow[]): CachedWindow[] {
+  return windows.map((w) => ({ ...w, gitRepo: w.gitRepo ? { ...w.gitRepo } : null }))
 }
 
-function toDto(w: TerminalWindow, index: number): WindowDto {
+async function withGitRepo(w: TerminalWindow): Promise<CachedWindow> {
+  return { ...w, gitRepo: await gitRepoInfo(w.cwd) }
+}
+
+function toDto(w: CachedWindow, index: number): WindowDto {
   return {
     key: encodeURIComponent(JSON.stringify([index, w.id, w.terminalId, w.title, w.cwd, w.tabCount])),
     id: w.id,
@@ -27,6 +37,7 @@ function toDto(w: TerminalWindow, index: number): WindowDto {
     title: w.title,
     cwd: w.cwd,
     tabCount: w.tabCount,
+    gitRepo: w.gitRepo,
   }
 }
 
@@ -36,10 +47,11 @@ export async function refreshWindows(): Promise<void> {
   refreshInFlight = (async () => {
     try {
       const latest = await listWindows()
-      const snapshot = cloneWindows(latest)
+      const enriched = await Promise.all(latest.map(withGitRepo))
+      const snapshot = cloneWindows(enriched)
       if (!isEqual(snapshot, lastSnapshot)) {
         lastSnapshot = snapshot
-        cachedWindows = cloneWindows(latest)
+        cachedWindows = cloneWindows(enriched)
       }
     } catch (e) {
       console.error('Refresh failed:', e instanceof Error ? e.message : e)
