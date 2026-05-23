@@ -444,23 +444,6 @@
       }
 
       /* TECH STACK */
-      .tech-pills {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 32px;
-      }
-
-      .tech-pill {
-        padding: 8px 18px;
-        border-radius: 100px;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--text-secondary);
-      }
-
       /* CTA */
       .cta-section {
         text-align: center;
@@ -563,7 +546,6 @@
         <div class="nav-links">
           <a href="#features" data-i18n="nav_features">Features</a>
           <a href="#how-it-works" data-i18n="nav_how">How It Works</a>
-          <a href="#stack" data-i18n="nav_stack">Stack</a>
           <a href="https://github.com/nano-props/summon" target="_blank" rel="noopener noreferrer">GitHub</a>
         </div>
         <div class="lang-toggle">
@@ -833,30 +815,6 @@
       </div>
     </section>
 
-    <!-- STACK -->
-    <section id="stack">
-      <div class="container">
-        <div class="section-label" data-i18n="stack_label">Built With</div>
-        <h2 class="section-title" data-i18n="stack_title">Modern, lean stack</h2>
-        <p class="section-desc" data-i18n="stack_desc">
-          Fast to build, fast to run. Electron for the shell, React for the UI, AppleScript for the glue, Vitest for
-          testing.
-        </p>
-        <div class="tech-pills">
-          <span class="tech-pill">Electron</span>
-          <span class="tech-pill">React 19</span>
-          <span class="tech-pill">TypeScript</span>
-          <span class="tech-pill">Vite</span>
-          <span class="tech-pill">Tailwind CSS</span>
-          <span class="tech-pill">Zustand</span>
-          <span class="tech-pill">i18next</span>
-          <span class="tech-pill">AppleScript</span>
-          <span class="tech-pill">Vitest</span>
-          <span class="tech-pill">Bun</span>
-        </div>
-      </div>
-    </section>
-
     <!-- CTA -->
     <div class="cta-section fade-in">
       <h2 data-i18n-html="cta_title">Ready to take control of<br />your terminals?</h2>
@@ -909,7 +867,6 @@
         en: {
           nav_features: 'Features',
           nav_how: 'How It Works',
-          nav_stack: 'Stack',
           hero_badge: 'macOS Utility',
           hero_title: 'Switch Ghostty windows<br/><span>in a flash</span>',
           hero_sub:
@@ -951,10 +908,6 @@
           s3_title: 'Activate & Go',
           s3_desc:
             'Select a window with keyboard or mouse. Summon activates it — even focusing the right tab — and auto-hides the panel.',
-          stack_label: 'Built With',
-          stack_title: 'Modern, lean stack',
-          stack_desc:
-            'Fast to build, fast to run. Electron for the shell, React for the UI, AppleScript for the glue, Vitest for testing.',
           cta_title: 'Ready to take control of<br/>your terminals?',
           cta_desc: 'Summon is free, open-source, and MIT-licensed.',
           footer_made: 'Made by',
@@ -962,7 +915,6 @@
         zh: {
           nav_features: '功能',
           nav_how: '使用方式',
-          nav_stack: '技术栈',
           hero_badge: 'macOS 实用工具',
           hero_title: '在 Ghostty 窗口间<br/><span>闪电切换</span>',
           hero_sub:
@@ -1003,10 +955,6 @@
           s3_title: '激活即走',
           s3_desc:
             '用键盘或鼠标选中窗口。Summon 立即激活它——甚至定位到正确的标签页——然后自动隐藏面板。',
-          stack_label: '技术栈',
-          stack_title: '现代、精简的技术方案',
-          stack_desc:
-            '构建快，运行快。Electron 做外壳，React 做界面，AppleScript 做桥梁，Vitest 做测试。',
           cta_title: '准备好掌控<br/>你的终端了吗？',
           cta_desc: 'Summon 免费、开源，基于 MIT 许可证。',
           footer_made: '由',
@@ -1014,7 +962,6 @@
         ko: {
           nav_features: '기능',
           nav_how: '사용 방법',
-          nav_stack: '기술 스택',
           hero_badge: 'macOS 유틸리티',
           hero_title: 'Ghostty 창을<br/><span>번개처럼 전환</span>',
           hero_sub:
@@ -1056,10 +1003,6 @@
           s3_title: '활성화 & 이동',
           s3_desc:
             '키보드나 마우스로 창을 선택하세요. Summon이 해당 창을 활성화하고 — 올바른 탭까지 포커싱한 후 — 패널을 자동으로 숨깁니다.',
-          stack_label: '기술 스택',
-          stack_title: '현대적이고 가벼운 스택',
-          stack_desc:
-            '빌드도 빠르고 실행도 빠릅니다. Electron이 셸, React가 UI, AppleScript가 접착제, Vitest가 테스트를 담당합니다.',
           cta_title: '터미널을 제어할<br/>준비가 되셨나요?',
           cta_desc: 'Summon은 무료 오픈소스이며 MIT 라이선스입니다.',
           footer_made: '만든이',
@@ -1067,7 +1010,6 @@
         ja: {
           nav_features: '機能',
           nav_how: '使い方',
-          nav_stack: '技術スタック',
           hero_badge: 'macOS ユーティリティ',
           hero_title: 'Ghostty ウィンドウを<br/><span>瞬時に切り替え</span>',
           hero_sub:
@@ -1109,10 +1051,6 @@
           s3_title: '切り替え & 完了',
           s3_desc:
             'キーボードまたはマウスでウィンドウを選択。Summon がそのウィンドウをアクティブにし — 正しいタブにフォーカスして — パネルを自動的に非表示にします。',
-          stack_label: '技術スタック',
-          stack_title: 'モダンで軽量なスタック',
-          stack_desc:
-            'ビルドも実行も高速。Electron がシェル、React が UI、AppleScript がグルー、Vitest がテストを担当。',
           cta_title: 'ターミナルを制御する<br/>準備はできましたか？',
           cta_desc: 'Summon は無料・オープンソース、MIT ライセンスです。',
           footer_made: '作者',
