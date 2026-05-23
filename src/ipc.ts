@@ -4,7 +4,7 @@ import { activateWindow, newTerminal } from '#/src/ghostty.ts'
 import type { PanelController } from '#/src/panel.ts'
 import { loadPrefs } from '#/src/prefs.ts'
 import { IPC_CHANNELS } from '#/src/shared/ipc.ts'
-import { hasWindowId, refreshWindows } from '#/src/window-store.ts'
+import { getWindowsState, hasWindowId, refreshWindows } from '#/src/window-store.ts'
 
 interface RegisterIpcHandlersOptions {
   isDev: boolean
@@ -26,14 +26,10 @@ export function registerIpcHandlers(options: RegisterIpcHandlersOptions): void {
     }
   }
 
-  ipcMain.handle(IPC_CHANNELS.getWindows, async (event) => {
+  ipcMain.handle(IPC_CHANNELS.getWindows, (event) => {
     if (!validateSender(event.senderFrame)) return null
-    try {
-      return await refreshWindows()
-    } catch (e) {
-      console.error('get-windows failed:', e)
-      return null
-    }
+    void refreshWindows()
+    return getWindowsState()
   })
 
   ipcMain.handle(IPC_CHANNELS.activateWindow, async (event, id: string, terminalId = '') => {

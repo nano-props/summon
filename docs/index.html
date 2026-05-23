@@ -6,7 +6,7 @@
     <title>Summon — Window Switcher for Ghostty</title>
     <meta
       name="description"
-      content="A lightweight macOS utility for switching between Ghostty terminal windows from your tray."
+      content="A lightweight macOS menu-bar utility for switching between Ghostty terminal windows with git context and configurable shortcuts."
     />
     <link
       rel="icon"
@@ -503,27 +503,6 @@
         color: var(--text);
       }
 
-      /* CODE BLOCK */
-      .code-block {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 12px 20px;
-        font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
-        font-size: 14px;
-        margin-top: 24px;
-        color: var(--text-secondary);
-        user-select: all;
-      }
-
-      .code-block .prompt {
-        color: var(--teal);
-        user-select: none;
-      }
-
       /* RESPONSIVE */
       @media (max-width: 640px) {
         .nav-links {
@@ -590,6 +569,8 @@
         <div class="lang-toggle">
           <button id="lang-en" class="active" onclick="setLang('en')">EN</button>
           <button id="lang-zh" onclick="setLang('zh')">ZH</button>
+          <button id="lang-ko" onclick="setLang('ko')">KO</button>
+          <button id="lang-ja" onclick="setLang('ja')">JA</button>
         </div>
       </div>
     </nav>
@@ -616,7 +597,7 @@
       <img src="summon.png" alt="Summon Icon" class="hero-icon" />
       <h1 data-i18n-html="hero_title">Switch Ghostty windows<br /><span>in a flash</span></h1>
       <p class="hero-sub" data-i18n="hero_sub">
-        A tiny tray app that lists all your Ghostty terminal windows and jumps to any window instantly.
+        A tiny menu-bar app that lists every Ghostty window with git context, tab info, and a global shortcut.
       </p>
       <div class="hero-actions">
         <a
@@ -661,9 +642,10 @@
         <div class="section-label" data-i18n="features_label">Features</div>
         <h2 class="section-title" data-i18n-html="features_title">Everything you need,<br />nothing you don't</h2>
         <p class="section-desc" data-i18n="features_desc">
-          Summon lives quietly in your menu bar and surfaces every Ghostty window at a click.
+          Summon lives quietly in your menu bar and surfaces every Ghostty window with rich context at a keystroke.
         </p>
         <div class="features-grid">
+          <!-- f1: Instant Window List -->
           <div class="feature-card fade-in">
             <div class="feature-icon fi-purple">
               <svg
@@ -682,9 +664,11 @@
             </div>
             <h3 data-i18n="f1_title">Instant Window List</h3>
             <p data-i18n="f1_desc">
-              See every open Ghostty window with its title, working directory, and tab count in one compact panel.
+              See every open Ghostty window with its title, working directory, tab count, and git repository context in
+              one compact panel.
             </p>
           </div>
+          <!-- f2: Configurable Shortcut -->
           <div class="feature-card fade-in">
             <div class="feature-icon fi-teal">
               <svg
@@ -697,15 +681,18 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <path d="M12 20h9" />
-                <path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" />
+                <path
+                  d="M18 3a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3H6a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 3 3 0 0 0-3-3z"
+                />
               </svg>
             </div>
-            <h3 data-i18n="f2_title">Keyboard Shortcuts</h3>
+            <h3 data-i18n="f2_title">Configurable Shortcut</h3>
             <p data-i18n="f2_desc">
-              Use arrow keys, Enter, Escape, and ⌘1–⌘9 to move through windows without leaving the keyboard.
+              Choose from five global hotkeys — Option+Space, Option+Tab, and more — to summon the panel from anywhere.
+              Manage it right from the tray menu.
             </p>
           </div>
+          <!-- f3: Keyboard Navigation -->
           <div class="feature-card fade-in">
             <div class="feature-icon fi-red">
               <svg
@@ -718,15 +705,17 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <line x1="12" y1="5" x2="12" y2="19" />
-                <polyline points="19 12 12 19 5 12" />
+                <polyline points="7 15 12 20 17 15" />
+                <polyline points="7 9 12 4 17 9" />
               </svg>
             </div>
-            <h3 data-i18n="f3_title">Click to Focus</h3>
+            <h3 data-i18n="f3_title">Keyboard Navigation</h3>
             <p data-i18n="f3_desc">
-              Pick a window from the list and Summon immediately activates it, then gets out of your way.
+              Arrow keys, Tab, and ⌘1–⌘9 to jump between windows. Enter to activate, ⌘N for a new terminal, Escape to
+              dismiss — all without a mouse.
             </p>
           </div>
+          <!-- f4: Tray-Native -->
           <div class="feature-card fade-in">
             <div class="feature-icon fi-amber">
               <svg
@@ -747,10 +736,11 @@
             </div>
             <h3 data-i18n="f4_title">Tray-Native</h3>
             <p data-i18n="f4_desc">
-              Lives in the menu bar, never in the Dock. Choose Show Summon from the menu bar menu or press a shortcut to
-              summon the panel — Escape to dismiss.
+              Lives in the menu bar with macOS-native vibrancy and smooth animations. Auto-hides on blur, visible on all
+              workspaces — never in the Dock.
             </p>
           </div>
+          <!-- f5: Multilingual & Themed -->
           <div class="feature-card fade-in">
             <div class="feature-icon fi-blue">
               <svg
@@ -763,22 +753,18 @@
                 stroke-linecap="round"
                 stroke-linejoin="round"
               >
-                <circle cx="12" cy="12" r="5" />
-                <line x1="12" y1="1" x2="12" y2="3" />
-                <line x1="12" y1="21" x2="12" y2="23" />
-                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-                <line x1="1" y1="12" x2="3" y2="12" />
-                <line x1="21" y1="12" x2="23" y2="12" />
-                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                <circle cx="12" cy="12" r="10" />
+                <line x1="2" y1="12" x2="22" y2="12" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
               </svg>
             </div>
-            <h3 data-i18n="f5_title">Dark & Light Themes</h3>
+            <h3 data-i18n="f5_title">Multilingual & Themed</h3>
             <p data-i18n="f5_desc">
-              Toggle between dark and light mode right from the app. Your preference is remembered across sessions.
+              Supports English, Chinese, Korean, and Japanese with auto-detection. Switch between light, dark, and system
+              themes — all preferences persist across sessions.
             </p>
           </div>
+          <!-- f6: Real-Time Updates -->
           <div class="feature-card fade-in">
             <div class="feature-icon fi-green">
               <svg
@@ -794,10 +780,10 @@
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
               </svg>
             </div>
-            <h3 data-i18n="f6_title">Live Updates</h3>
+            <h3 data-i18n="f6_title">Real-Time Updates</h3>
             <p data-i18n="f6_desc">
-              The window list refreshes automatically every two seconds. New terminals appear, closed ones disappear —
-              no manual reload needed.
+              New terminals appear instantly and closed ones vanish on their own. The window list always reflects the
+              latest state — no manual refresh needed.
             </p>
           </div>
         </div>
@@ -818,8 +804,8 @@
             <div class="step-content">
               <h3 data-i18n="s1_title">Launch Summon</h3>
               <p data-i18n="s1_desc">
-                It starts silently in your menu bar. No Dock icon, no window clutter — just a small tray icon waiting
-                for your click.
+                It starts silently in your menu bar. Press your configured global shortcut — or click the tray icon — to
+                bring up the floating panel.
               </p>
             </div>
           </div>
@@ -828,17 +814,18 @@
             <div class="step-content">
               <h3 data-i18n="s2_title">Browse Windows</h3>
               <p data-i18n="s2_desc">
-                A compact centered panel shows every open Ghostty window with its title, working directory, and tab
-                count.
+                A translucent panel shows every open Ghostty window with its title, working directory, tab count, and
+                git repository name.
               </p>
             </div>
           </div>
           <div class="step fade-in">
             <div class="step-num">3</div>
             <div class="step-content">
-              <h3 data-i18n="s3_title">Click to Focus</h3>
+              <h3 data-i18n="s3_title">Activate & Go</h3>
               <p data-i18n="s3_desc">
-                Select a window and it activates immediately. The panel auto-hides so you're right where you need to be.
+                Select a window with keyboard or mouse. Summon activates it — even focusing the right tab — and
+                auto-hides the panel.
               </p>
             </div>
           </div>
@@ -852,7 +839,8 @@
         <div class="section-label" data-i18n="stack_label">Built With</div>
         <h2 class="section-title" data-i18n="stack_title">Modern, lean stack</h2>
         <p class="section-desc" data-i18n="stack_desc">
-          Fast to build, fast to run. Electron for the shell, React for the UI, AppleScript for the glue.
+          Fast to build, fast to run. Electron for the shell, React for the UI, AppleScript for the glue, Vitest for
+          testing.
         </p>
         <div class="tech-pills">
           <span class="tech-pill">Electron</span>
@@ -861,7 +849,9 @@
           <span class="tech-pill">Vite</span>
           <span class="tech-pill">Tailwind CSS</span>
           <span class="tech-pill">Zustand</span>
+          <span class="tech-pill">i18next</span>
           <span class="tech-pill">AppleScript</span>
+          <span class="tech-pill">Vitest</span>
           <span class="tech-pill">Bun</span>
         </div>
       </div>
@@ -922,44 +912,49 @@
           nav_stack: 'Stack',
           hero_badge: 'macOS Utility',
           hero_title: 'Switch Ghostty windows<br/><span>in a flash</span>',
-          hero_sub: 'A tiny tray app that lists all your Ghostty terminal windows and jumps to any window instantly.',
+          hero_sub:
+            'A tiny menu-bar app that lists every Ghostty window with git context, tab info, and a global shortcut.',
           btn_download: 'Download',
           btn_source: 'Source Code',
           btn_github: 'View on GitHub',
           features_label: 'Features',
           features_title: "Everything you need,<br/>nothing you don't",
-          features_desc: 'Summon lives quietly in your menu bar and surfaces every Ghostty window at a click.',
+          features_desc:
+            'Summon lives quietly in your menu bar and surfaces every Ghostty window with rich context at a keystroke.',
           f1_title: 'Instant Window List',
           f1_desc:
-            'See every open Ghostty window with its title, working directory, and tab count in one compact panel.',
-          f2_title: 'Keyboard Shortcuts',
-          f2_desc: 'Use arrow keys, Enter, Escape, and ⌘1–⌘9 to move through windows without leaving the keyboard.',
-          f3_title: 'Click to Focus',
-          f3_desc: 'Pick a window from the list and Summon immediately activates it, then gets out of your way.',
+            'See every open Ghostty window with its title, working directory, tab count, and git repository context in one compact panel.',
+          f2_title: 'Configurable Shortcut',
+          f2_desc:
+            'Choose from five global hotkeys — Option+Space, Option+Tab, and more — to summon the panel from anywhere. Manage it right from the tray menu.',
+          f3_title: 'Keyboard Navigation',
+          f3_desc:
+            'Arrow keys, Tab, and ⌘1–⌘9 to jump between windows. Enter to activate, ⌘N for a new terminal, Escape to dismiss — all without a mouse.',
           f4_title: 'Tray-Native',
           f4_desc:
-            'Lives in the menu bar, never in the Dock. Choose Show Summon from the menu bar menu or press a shortcut to summon the panel — Escape to dismiss.',
-          f5_title: 'Dark & Light Themes',
+            'Lives in the menu bar with macOS-native vibrancy and smooth animations. Auto-hides on blur, visible on all workspaces — never in the Dock.',
+          f5_title: 'Multilingual & Themed',
           f5_desc:
-            'Toggle between dark and light mode right from the app. Your preference is remembered across sessions.',
-          f6_title: 'Live Updates',
+            'Supports English, Chinese, Korean, and Japanese with auto-detection. Switch between light, dark, and system themes — all preferences persist across sessions.',
+          f6_title: 'Real-Time Updates',
           f6_desc:
-            'The window list refreshes automatically every two seconds. New terminals appear, closed ones disappear — no manual reload needed.',
+            'New terminals appear instantly and closed ones vanish on their own. The window list always reflects the latest state — no manual refresh needed.',
           how_label: 'How It Works',
           how_title: 'Three steps. Zero friction.',
           how_desc: "Summon talks to Ghostty through macOS automation, so there's nothing to configure.",
           s1_title: 'Launch Summon',
           s1_desc:
-            'It starts silently in your menu bar. No Dock icon, no window clutter — just a small tray icon waiting for your click.',
+            'It starts silently in your menu bar. Press your configured global shortcut — or click the tray icon — to bring up the floating panel.',
           s2_title: 'Browse Windows',
           s2_desc:
-            'A compact centered panel shows every open Ghostty window with its title, working directory, and tab count.',
-          s3_title: 'Click to Focus',
+            'A translucent panel shows every open Ghostty window with its title, working directory, tab count, and git repository name.',
+          s3_title: 'Activate & Go',
           s3_desc:
-            "Select a window and it activates immediately. The panel auto-hides so you're right where you need to be.",
+            'Select a window with keyboard or mouse. Summon activates it — even focusing the right tab — and auto-hides the panel.',
           stack_label: 'Built With',
           stack_title: 'Modern, lean stack',
-          stack_desc: 'Fast to build, fast to run. Electron for the shell, React for the UI, AppleScript for the glue.',
+          stack_desc:
+            'Fast to build, fast to run. Electron for the shell, React for the UI, AppleScript for the glue, Vitest for testing.',
           cta_title: 'Ready to take control of<br/>your terminals?',
           cta_desc: 'Summon is free, open-source, and MIT-licensed.',
           footer_made: 'Made by',
@@ -970,51 +965,184 @@
           nav_stack: '技术栈',
           hero_badge: 'macOS 实用工具',
           hero_title: '在 Ghostty 窗口间<br/><span>闪电切换</span>',
-          hero_sub: '一个轻巧的托盘应用，列出所有 Ghostty 终端窗口，并一键跳转。',
+          hero_sub:
+            '一个轻巧的菜单栏应用，列出所有 Ghostty 窗口——附带 Git 上下文、标签页信息和全局快捷键。',
           btn_download: '下载',
           btn_source: '源代码',
           btn_github: '在 GitHub 上查看',
           features_label: '功能特性',
           features_title: '你需要的都有，<br/>多余的一概没有',
-          features_desc: 'Summon 静静地待在菜单栏，点击即可呈现所有 Ghostty 窗口。',
+          features_desc: 'Summon 静静地待在菜单栏，一键呈现所有 Ghostty 窗口及其丰富的上下文信息。',
           f1_title: '即时窗口列表',
-          f1_desc: '在一个精巧面板里查看所有打开的 Ghostty 窗口，包括标题、工作目录和标签页数。',
-          f2_title: '键盘快捷操作',
-          f2_desc: '使用方向键、Enter、Escape 和 ⌘1–⌘9，无需离开键盘即可切换窗口。',
-          f3_title: '点击聚焦',
-          f3_desc: '从列表中选中窗口后，Summon 会立刻激活它，然后自动退到一边。',
+          f1_desc:
+            '在一个精巧面板里查看所有打开的 Ghostty 窗口，包括标题、工作目录、标签页数和 Git 仓库上下文。',
+          f2_title: '可配置快捷键',
+          f2_desc:
+            '从五种全局快捷键中选择——Option+Space、Option+Tab 等——随时随地唤出面板。直接在托盘菜单中管理。',
+          f3_title: '键盘导航',
+          f3_desc:
+            '方向键、Tab 和 ⌘1–⌘9 在窗口间跳转，Enter 激活，⌘N 新建终端，Escape 关闭——全程无需鼠标。',
           f4_title: '托盘常驻',
-          f4_desc: '只在菜单栏中显示，不占用 Dock 位置。通过菜单栏菜单或快捷键唤出面板，按 Escape 收起。',
-          f5_title: '深色 / 浅色主题',
-          f5_desc: '在应用内一键切换深色与浅色模式。偏好设置跨会话保持。',
-          f6_title: '实时刷新',
-          f6_desc: '窗口列表每两秒自动刷新。新开的终端自动出现，关闭的自动消失，无需手动操作。',
+          f4_desc:
+            '常驻菜单栏，支持 macOS 原生毛玻璃效果和流畅动画。失焦自动隐藏，全桌面可见——不占用 Dock 位置。',
+          f5_title: '多语言 & 主题',
+          f5_desc:
+            '支持英语、中文、韩语、日语并自动检测系统语言。在浅色、深色和跟随系统主题间切换——所有偏好跨会话保持。',
+          f6_title: '实时更新',
+          f6_desc:
+            '新终端即时出现，关闭的自动消失。窗口列表始终反映最新状态——无需手动刷新。',
           how_label: '使用方式',
           how_title: '三步上手，零配置。',
           how_desc: 'Summon 通过 macOS 自动化与 Ghostty 通信，无需任何配置。',
           s1_title: '启动 Summon',
-          s1_desc: '它默默出现在菜单栏中。没有 Dock 图标，没有窗口干扰——只有一个小图标等待你的点击。',
+          s1_desc:
+            '它默默出现在菜单栏中。按下你配置的全局快捷键——或点击托盘图标——唤出浮动面板。',
           s2_title: '浏览窗口',
-          s2_desc: '一个精巧的居中面板会展示所有打开的 Ghostty 窗口，包括标题、工作目录和标签页数。',
-          s3_title: '点击聚焦',
-          s3_desc: '选中一个窗口，它立刻被激活。面板自动收起，你已经在需要的地方了。',
+          s2_desc:
+            '一个半透明面板展示所有打开的 Ghostty 窗口，包括标题、工作目录、标签页数和 Git 仓库名称。',
+          s3_title: '激活即走',
+          s3_desc:
+            '用键盘或鼠标选中窗口。Summon 立即激活它——甚至定位到正确的标签页——然后自动隐藏面板。',
           stack_label: '技术栈',
           stack_title: '现代、精简的技术方案',
-          stack_desc: '构建快，运行快。Electron 做外壳，React 做界面，AppleScript 做桥梁。',
+          stack_desc:
+            '构建快，运行快。Electron 做外壳，React 做界面，AppleScript 做桥梁，Vitest 做测试。',
           cta_title: '准备好掌控<br/>你的终端了吗？',
           cta_desc: 'Summon 免费、开源，基于 MIT 许可证。',
           footer_made: '由',
         },
+        ko: {
+          nav_features: '기능',
+          nav_how: '사용 방법',
+          nav_stack: '기술 스택',
+          hero_badge: 'macOS 유틸리티',
+          hero_title: 'Ghostty 창을<br/><span>번개처럼 전환</span>',
+          hero_sub:
+            'Git 컨텍스트, 탭 정보, 글로벌 단축키를 갖춘 작은 메뉴 바 앱.',
+          btn_download: '다운로드',
+          btn_source: '소스 코드',
+          btn_github: 'GitHub에서 보기',
+          features_label: '기능',
+          features_title: '필요한 건 전부,<br/>불필요한 건 제로',
+          features_desc:
+            'Summon은 메뉴 바에 조용히 상주하며 키 하나로 모든 Ghostty 창을 풍부한 컨텍스트와 함께 보여줍니다.',
+          f1_title: '즉시 창 목록',
+          f1_desc:
+            '모든 Ghostty 창의 제목, 작업 디렉토리, 탭 수, Git 리포지토리 컨텍스트를 한 패널에서 확인하세요.',
+          f2_title: '단축키 설정',
+          f2_desc:
+            'Option+Space, Option+Tab 등 다섯 가지 글로벌 단축키 중 선택하세요. 트레이 메뉴에서 바로 관리할 수 있습니다.',
+          f3_title: '키보드 내비게이션',
+          f3_desc:
+            '방향키, Tab, ⌘1–⌘9로 창 간 이동. Enter로 활성화, ⌘N으로 새 터미널, Escape로 닫기 — 마우스 없이.',
+          f4_title: '트레이 네이티브',
+          f4_desc:
+            'macOS 네이티브 반투명 효과와 부드러운 애니메이션으로 메뉴 바에 상주. 포커스를 잃으면 자동 숨김, 모든 워크스페이스에서 표시 — Dock에는 나타나지 않습니다.',
+          f5_title: '다국어 & 테마',
+          f5_desc:
+            '영어, 중국어, 한국어, 일본어를 자동 감지로 지원. 라이트, 다크, 시스템 테마 간 전환 — 모든 설정이 세션 간 유지됩니다.',
+          f6_title: '실시간 업데이트',
+          f6_desc:
+            '새 터미널이 즉시 나타나고 닫힌 터미널은 바로 사라집니다. 창 목록이 항상 최신 상태를 유지합니다 — 수동 새로고침 불필요.',
+          how_label: '사용 방법',
+          how_title: '세 단계. 마찰 제로.',
+          how_desc: 'Summon은 macOS 자동화를 통해 Ghostty와 통신하므로 설정이 필요 없습니다.',
+          s1_title: 'Summon 실행',
+          s1_desc:
+            '메뉴 바에 조용히 시작됩니다. 설정한 글로벌 단축키를 누르거나 트레이 아이콘을 클릭하여 플로팅 패널을 띄우세요.',
+          s2_title: '창 탐색',
+          s2_desc:
+            '반투명 패널에서 모든 Ghostty 창의 제목, 작업 디렉토리, 탭 수, Git 리포지토리 이름을 확인하세요.',
+          s3_title: '활성화 & 이동',
+          s3_desc:
+            '키보드나 마우스로 창을 선택하세요. Summon이 해당 창을 활성화하고 — 올바른 탭까지 포커싱한 후 — 패널을 자동으로 숨깁니다.',
+          stack_label: '기술 스택',
+          stack_title: '현대적이고 가벼운 스택',
+          stack_desc:
+            '빌드도 빠르고 실행도 빠릅니다. Electron이 셸, React가 UI, AppleScript가 접착제, Vitest가 테스트를 담당합니다.',
+          cta_title: '터미널을 제어할<br/>준비가 되셨나요?',
+          cta_desc: 'Summon은 무료 오픈소스이며 MIT 라이선스입니다.',
+          footer_made: '만든이',
+        },
+        ja: {
+          nav_features: '機能',
+          nav_how: '使い方',
+          nav_stack: '技術スタック',
+          hero_badge: 'macOS ユーティリティ',
+          hero_title: 'Ghostty ウィンドウを<br/><span>瞬時に切り替え</span>',
+          hero_sub:
+            'Git コンテキスト、タブ情報、グローバルショートカットを備えた小さなメニューバーアプリ。',
+          btn_download: 'ダウンロード',
+          btn_source: 'ソースコード',
+          btn_github: 'GitHub で見る',
+          features_label: '機能',
+          features_title: '必要なものはすべて、<br/>余計なものはゼロ',
+          features_desc:
+            'Summon はメニューバーに静かに常駐し、キー操作ひとつですべての Ghostty ウィンドウをリッチなコンテキストとともに表示します。',
+          f1_title: 'インスタントウィンドウリスト',
+          f1_desc:
+            'すべての Ghostty ウィンドウのタイトル、作業ディレクトリ、タブ数、Git リポジトリコンテキストをコンパクトなパネルで確認。',
+          f2_title: 'ショートカット設定',
+          f2_desc:
+            'Option+Space、Option+Tab など 5 つのグローバルホットキーから選択。トレイメニューから直接管理できます。',
+          f3_title: 'キーボードナビゲーション',
+          f3_desc:
+            '矢印キー、Tab、⌘1–⌘9 でウィンドウ間を移動。Enter で切り替え、⌘N で新規ターミナル、Escape で閉じる — マウス不要。',
+          f4_title: 'トレイネイティブ',
+          f4_desc:
+            'macOS ネイティブの半透明エフェクトとスムーズなアニメーション付きでメニューバーに常駐。フォーカスを失うと自動非表示、すべてのワークスペースで表示 — Dock には表示されません。',
+          f5_title: '多言語 & テーマ',
+          f5_desc:
+            '英語、中国語、韓国語、日本語を自動検出でサポート。ライト、ダーク、システムテーマを切り替え — すべての設定がセッション間で保持されます。',
+          f6_title: 'リアルタイム更新',
+          f6_desc:
+            '新しいターミナルが即座に表示され、閉じたターミナルはすぐに消えます。ウィンドウリストが常に最新状態を保ちます — 手動リフレッシュ不要。',
+          how_label: '使い方',
+          how_title: '3 ステップ。摩擦ゼロ。',
+          how_desc: 'Summon は macOS オートメーションを通じて Ghostty と通信するため、設定は不要です。',
+          s1_title: 'Summon を起動',
+          s1_desc:
+            'メニューバーに静かに起動します。設定したグローバルショートカットを押すか、トレイアイコンをクリックしてフローティングパネルを表示。',
+          s2_title: 'ウィンドウを閲覧',
+          s2_desc:
+            '半透明パネルですべての Ghostty ウィンドウのタイトル、作業ディレクトリ、タブ数、Git リポジトリ名を確認。',
+          s3_title: '切り替え & 完了',
+          s3_desc:
+            'キーボードまたはマウスでウィンドウを選択。Summon がそのウィンドウをアクティブにし — 正しいタブにフォーカスして — パネルを自動的に非表示にします。',
+          stack_label: '技術スタック',
+          stack_title: 'モダンで軽量なスタック',
+          stack_desc:
+            'ビルドも実行も高速。Electron がシェル、React が UI、AppleScript がグルー、Vitest がテストを担当。',
+          cta_title: 'ターミナルを制御する<br/>準備はできましたか？',
+          cta_desc: 'Summon は無料・オープンソース、MIT ライセンスです。',
+          footer_made: '作者',
+        },
       }
 
-      let currentLang = localStorage.getItem('lang') || (navigator.language.startsWith('zh') ? 'zh' : 'en')
+      const LANG_TAGS = { en: 'en', zh: 'zh-CN', ko: 'ko', ja: 'ja' }
+      const LANGS = Object.keys(LANG_TAGS)
+
+      function detectLang() {
+        const nav = navigator.language
+        if (nav.startsWith('zh')) return 'zh'
+        if (nav.startsWith('ko')) return 'ko'
+        if (nav.startsWith('ja')) return 'ja'
+        return 'en'
+      }
+
+      function loadLang() {
+        try { return localStorage.getItem('lang') } catch { return null }
+      }
+
+      let currentLang = loadLang()
+      if (!i18n[currentLang]) currentLang = detectLang()
 
       function setLang(lang) {
+        if (!i18n[lang]) return
         currentLang = lang
-        localStorage.setItem('lang', lang)
-        document.documentElement.lang = lang === 'zh' ? 'zh-CN' : 'en'
-        document.getElementById('lang-en').classList.toggle('active', lang === 'en')
-        document.getElementById('lang-zh').classList.toggle('active', lang === 'zh')
+        try { localStorage.setItem('lang', lang) } catch {}
+        document.documentElement.lang = LANG_TAGS[lang] || 'en'
+        LANGS.forEach((l) => document.getElementById('lang-' + l).classList.toggle('active', l === lang))
 
         const texts = i18n[lang]
         document.querySelectorAll('[data-i18n]').forEach((el) => {
