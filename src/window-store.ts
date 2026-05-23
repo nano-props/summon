@@ -1,4 +1,5 @@
 import { isEqual } from 'lodash-es'
+import pLimit from 'p-limit'
 import { gitRepoInfo, type GitRepoInfo } from '#/src/git.ts'
 import { listWindows } from '#/src/ghostty.ts'
 import type { TerminalWindow } from '#/src/ghostty.ts'
@@ -20,6 +21,7 @@ interface CachedWindow extends TerminalWindow {
 let cachedWindows: CachedWindow[] = []
 let lastSnapshot: CachedWindow[] | null = null
 let refreshInFlight: Promise<void> | null = null
+const enrichGitRepo = pLimit(4)
 
 function cloneWindows(windows: CachedWindow[]): CachedWindow[] {
   return windows.map((w) => ({ ...w, gitRepo: w.gitRepo ? { ...w.gitRepo } : null }))
@@ -47,7 +49,7 @@ export async function refreshWindows(): Promise<void> {
   refreshInFlight = (async () => {
     try {
       const latest = await listWindows()
-      const enriched = await Promise.all(latest.map(withGitRepo))
+      const enriched = await Promise.all(latest.map((w) => enrichGitRepo(() => withGitRepo(w))))
       const snapshot = cloneWindows(enriched)
       if (!isEqual(snapshot, lastSnapshot)) {
         lastSnapshot = snapshot

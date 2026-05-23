@@ -9,12 +9,11 @@
     "noEmit": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "lib": ["ES2022", "DOM"],
-    "types": ["node"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["node", "vitest", "electron"],
     "paths": {
       "#/*": ["./*"]
     }
   },
-  "include": ["src/**/*.ts", "electron-builder.ts", "renderer/vite.config.ts"],
-  "exclude": ["src/**/*.test.ts"]
+  "include": ["src/**/*.test.ts", "renderer/src/**/*.test.ts", "renderer/src/**/*.test.tsx", "vitest.config.ts"]
 }

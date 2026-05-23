@@ -1,7 +1,7 @@
 import { app } from 'electron/main'
-import { readFileSync, writeFileSync, mkdirSync, renameSync, unlinkSync } from 'node:fs'
+import { readFileSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
-import { randomBytes } from 'node:crypto'
+import writeFileAtomic from 'write-file-atomic'
 import { SHORTCUT_ACCELERATORS, type ShortcutAccelerator } from '#/src/shared/shortcuts.ts'
 
 export type ThemeMode = 'light' | 'dark' | 'auto'
@@ -94,19 +94,8 @@ export function loadPrefs(): Prefs {
 export function updatePrefs(patch: Partial<StoredPrefs>): Prefs {
   const next = normalizePrefs({ ...readCached(), ...patch })
   const target = prefsPath()
-  const tmp = `${target}.${process.pid}.${randomBytes(6).toString('hex')}.tmp`
-  try {
-    mkdirSync(path.dirname(target), { recursive: true })
-    writeFileSync(tmp, JSON.stringify(next, null, 2), { encoding: 'utf-8', mode: 0o600 })
-    renameSync(tmp, target)
-  } catch (e) {
-    try {
-      unlinkSync(tmp)
-    } catch {
-      // tmp may not exist — ignore
-    }
-    throw e
-  }
+  mkdirSync(path.dirname(target), { recursive: true })
+  writeFileAtomic.sync(target, JSON.stringify(next, null, 2), { encoding: 'utf-8', mode: 0o600 })
   cached = next
   return loadPrefs()
 }

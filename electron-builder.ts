@@ -21,7 +21,7 @@ const config: Configuration = {
   directories: {
     output: 'dist',
   },
-  files: ['src/**/*', 'dist-renderer/**/*', 'icons/**/*', 'package.json', '!**/*.map'],
+  files: ['src/**/*', '!src/**/*.test.ts', 'dist-renderer/**/*', 'icons/**/*', 'package.json', '!**/*.map'],
   mac: {
     category: 'public.app-category.utilities',
     target: [

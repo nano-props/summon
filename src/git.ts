@@ -1,4 +1,5 @@
 import { execa } from 'execa'
+import QuickLRU from 'quick-lru'
 import path from 'node:path'
 
 export interface GitRepoInfo {
@@ -7,14 +8,10 @@ export interface GitRepoInfo {
   isRoot: boolean
 }
 
-interface CacheEntry {
-  value: GitRepoInfo | null
-  expiresAt: number
-}
-
 const CACHE_TTL_MS = 10_000
+const CACHE_TARGET_ENTRIES = 200
 const GIT_TIMEOUT_MS = 600
-const cache = new Map<string, CacheEntry>()
+const cache = new QuickLRU<string, GitRepoInfo | false>({ maxSize: CACHE_TARGET_ENTRIES, maxAge: CACHE_TTL_MS })
 
 function normalizePath(value: string): string {
   return path.resolve(value)
@@ -22,9 +19,8 @@ function normalizePath(value: string): string {
 
 export async function gitRepoInfo(cwd: string): Promise<GitRepoInfo | null> {
   if (!cwd) return null
-  const now = Date.now()
   const cached = cache.get(cwd)
-  if (cached && cached.expiresAt > now) return cached.value
+  if (cached !== undefined) return cached || null
 
   try {
     const { stdout } = await execa('git', ['-C', cwd, 'rev-parse', '--show-toplevel'], { timeout: GIT_TIMEOUT_MS })
@@ -34,10 +30,10 @@ export async function gitRepoInfo(cwd: string): Promise<GitRepoInfo | null> {
       rootName: path.basename(root) || root,
       isRoot: normalizePath(cwd) === root,
     }
-    cache.set(cwd, { value, expiresAt: now + CACHE_TTL_MS })
+    cache.set(cwd, value)
     return value
   } catch {
-    cache.set(cwd, { value: null, expiresAt: now + CACHE_TTL_MS })
+    cache.set(cwd, false)
     return null
   }
 }
