@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { LayoutGrid } from 'lucide-react'
 import { summonClient } from '#/renderer/src/data/summon-client.ts'
 import { Header } from '#/renderer/src/Header.tsx'
+import { ScrollArea } from '#/renderer/src/components/ui/ScrollArea.tsx'
 import { useStore } from '#/renderer/src/store.ts'
 import type { PanelAnimationPhase } from '#/src/shared/contracts.ts'
 import { useKeyboardNav } from '#/renderer/src/useKeyboardNav.ts'
@@ -74,7 +75,7 @@ export function App() {
     >
       <Header />
 
-      <div className="custom-scrollbar flex-1 overflow-y-auto">
+      <ScrollArea className="flex-1 min-h-0">
         {windows.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center py-10 px-5 text-muted-foreground text-sm gap-2">
             <LayoutGrid className="size-7 opacity-30" />
@@ -88,7 +89,7 @@ export function App() {
             ))}
           </div>
         )}
-      </div>
+      </ScrollArea>
     </div>
   )
 }

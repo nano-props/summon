@@ -39,6 +39,7 @@
     "wait-on": "9.0.10"
   },
   "dependencies": {
+    "@radix-ui/react-scroll-area": "1.2.10",
     "clsx": "2.1.1",
     "execa": "9.6.1",
     "i18next": "26.2.0",
