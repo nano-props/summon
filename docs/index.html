@@ -36,7 +36,7 @@
       }
 
       @media (prefers-color-scheme: dark) {
-        :root {
+        html:not([data-theme="light"]) {
           --bg: #111111;
           --bg-card: #1a1a1a;
           --text: #e8e5e0;
@@ -46,6 +46,17 @@
           --border: #2a2a2a;
           --gradient: linear-gradient(135deg, #1a1525 0%, #121e1c 50%, #1e1412 100%);
         }
+      }
+
+      html[data-theme="dark"] {
+        --bg: #111111;
+        --bg-card: #1a1a1a;
+        --text: #e8e5e0;
+        --text-secondary: #999;
+        --accent: #e86b5a;
+        --accent-light: #2a1c1a;
+        --border: #2a2a2a;
+        --gradient: linear-gradient(135deg, #1a1525 0%, #121e1c 50%, #1e1412 100%);
       }
 
       html {
@@ -74,13 +85,19 @@
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         background: rgba(250, 249, 247, 0.8);
-        border-bottom: 1px solid var(--border);
+        box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
       }
 
       @media (prefers-color-scheme: dark) {
-        nav {
+        html:not([data-theme="light"]) nav {
           background: rgba(17, 17, 17, 0.8);
+          box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
         }
+      }
+
+      html[data-theme="dark"] nav {
+        background: rgba(17, 17, 17, 0.8);
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
       }
 
       .nav-brand {
@@ -102,12 +119,19 @@
       .nav-right {
         display: flex;
         align-items: center;
-        gap: 28px;
+        gap: 8px;
       }
 
       .nav-links {
         display: flex;
         gap: 28px;
+      }
+
+      .sep {
+        width: 1px;
+        height: 16px;
+        background: var(--border);
+        margin: 0 4px;
       }
 
       .nav-links a {
@@ -123,27 +147,27 @@
       }
 
       .lang-toggle {
-        display: flex;
-        align-items: center;
-        gap: 0;
-        background: var(--bg-card);
+        display: inline-flex;
         border: 1px solid var(--border);
         border-radius: 8px;
         overflow: hidden;
-        cursor: pointer;
-        flex-shrink: 0;
+        background: var(--bg-card);
       }
 
       .lang-toggle button {
-        padding: 5px 10px;
-        font-size: 13px;
-        font-weight: 600;
-        border: none;
+        border: 0;
         background: transparent;
         color: var(--text-secondary);
+        padding: 0 12px;
+        height: 34px;
         cursor: pointer;
+        font: 600 12px/1 ui-monospace, 'SF Mono', Menlo, monospace;
+        letter-spacing: 0.06em;
         transition: all 0.2s;
-        line-height: 1;
+      }
+
+      .lang-toggle button + button {
+        border-left: 1px solid var(--border);
       }
 
       .lang-toggle button.active {
@@ -353,25 +377,32 @@
       }
 
       @media (prefers-color-scheme: dark) {
-        .fi-purple {
+        html:not([data-theme="light"]) .fi-purple {
           background: #2a2040;
         }
-        .fi-teal {
+        html:not([data-theme="light"]) .fi-teal {
           background: #1a2e2a;
         }
-        .fi-red {
+        html:not([data-theme="light"]) .fi-red {
           background: #2e1a18;
         }
-        .fi-amber {
+        html:not([data-theme="light"]) .fi-amber {
           background: #2e2418;
         }
-        .fi-blue {
+        html:not([data-theme="light"]) .fi-blue {
           background: #1a2230;
         }
-        .fi-green {
+        html:not([data-theme="light"]) .fi-green {
           background: #1a2e1e;
         }
       }
+
+      html[data-theme="dark"] .fi-purple { background: #2a2040; }
+      html[data-theme="dark"] .fi-teal { background: #1a2e2a; }
+      html[data-theme="dark"] .fi-red { background: #2e1a18; }
+      html[data-theme="dark"] .fi-amber { background: #2e2418; }
+      html[data-theme="dark"] .fi-blue { background: #1a2230; }
+      html[data-theme="dark"] .fi-green { background: #1a2e1e; }
 
       .feature-card h3 {
         font-size: 17px;
@@ -520,6 +551,42 @@
         }
       }
 
+      /* THEME TOGGLE */
+      .theme-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--bg-card);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: border-color 0.2s, color 0.2s;
+        flex-shrink: 0;
+      }
+
+      .theme-toggle:hover {
+        border-color: var(--text-secondary);
+        color: var(--text);
+      }
+
+      .theme-toggle svg { width: 15px; height: 15px; }
+
+      .theme-toggle .icon-sun { display: none; }
+      .theme-toggle .icon-moon { display: block; }
+
+      @media (prefers-color-scheme: dark) {
+        html:not([data-theme="light"]) .theme-toggle .icon-sun { display: block; }
+        html:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
+      }
+
+      html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+      html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+      html[data-theme="light"] .theme-toggle .icon-sun { display: none; }
+      html[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+
       /* ANIMATE ON SCROLL */
       .fade-in {
         opacity: 0;
@@ -548,12 +615,21 @@
           <a href="#how-it-works" data-i18n="nav_how">How It Works</a>
           <a href="https://github.com/nano-props/summon" target="_blank" rel="noopener noreferrer">GitHub</a>
         </div>
+        <span class="sep"></span>
         <div class="lang-toggle">
-          <button id="lang-en" class="active" onclick="setLang('en')">EN</button>
-          <button id="lang-zh" onclick="setLang('zh')">ZH</button>
-          <button id="lang-ko" onclick="setLang('ko')">KO</button>
-          <button id="lang-ja" onclick="setLang('ja')">JA</button>
+          <button id="lang-en" lang="en" class="active" onclick="setLang('en')">EN</button>
+          <button id="lang-zh" lang="zh" onclick="setLang('zh')">中</button>
+          <button id="lang-ko" lang="ko" onclick="setLang('ko')">한</button>
+          <button id="lang-ja" lang="ja" onclick="setLang('ja')">日</button>
         </div>
+        <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
       </div>
     </nav>
 
@@ -1094,6 +1170,26 @@
       }
 
       setLang(currentLang)
+
+      /* Theme toggle */
+      function getEffectiveTheme() {
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+      }
+
+      function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme)
+        try { localStorage.setItem('theme', theme) } catch {}
+      }
+
+      function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme') || getEffectiveTheme()
+        applyTheme(current === 'dark' ? 'light' : 'dark')
+      }
+
+      try {
+        const savedTheme = localStorage.getItem('theme')
+        if (savedTheme === 'dark' || savedTheme === 'light') applyTheme(savedTheme)
+      } catch {}
 
       const observer = new IntersectionObserver(
         (entries) => {

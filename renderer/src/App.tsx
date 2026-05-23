@@ -84,7 +84,7 @@ export function App() {
         ) : (
           <div ref={listRef} className="flex flex-col bg-list overflow-hidden">
             {windows.map((w, i) => (
-              <WindowCard key={w.id} window={w} index={i} selected={i === selectedIndex} />
+              <WindowCard key={i} window={w} index={i} selected={i === selectedIndex} />
             ))}
           </div>
         )}
