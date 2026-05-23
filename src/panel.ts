@@ -6,9 +6,10 @@ const WORKSPACE_VISIBILITY_OPTIONS = {
   visibleOnFullScreen: false,
   skipTransformProcessType: true,
 } as const
-const PANEL_WIDTH = 560
-const PANEL_HEIGHT = 380
+const PANEL_WIDTH = 600
+const PANEL_HEIGHT = 360
 const AUTO_HIDE_ON_BLUR_DELAY_MS = 100
+const PANEL_ANIMATION_CHANNEL = 'panel-animation'
 
 interface PanelControllerOptions {
   isDev: boolean
@@ -16,6 +17,13 @@ interface PanelControllerOptions {
   prodRendererPath: string
   preloadPath: string
   onVisibilityChanged: () => void
+}
+
+interface PanelBounds {
+  x: number
+  y: number
+  width: number
+  height: number
 }
 
 export class PanelController {
@@ -43,7 +51,6 @@ export class PanelController {
       this.mainWindow = win
       win.once('ready-to-show', () => {
         if (this.mainWindow !== win || win.isDestroyed()) return
-        this.positionAtScreenCenter(win)
         this.showWindow(win)
       })
       return
@@ -52,7 +59,6 @@ export class PanelController {
     if (this.panelVisible) {
       this.hide()
     } else {
-      this.positionAtScreenCenter()
       this.show()
     }
   }
@@ -68,9 +74,11 @@ export class PanelController {
     this.clearBlurHideTimer()
     this.panelVisible = true
     win.setOpacity(0)
+    win.setBounds(this.getCenteredBounds())
     win.setVisibleOnAllWorkspaces(true, WORKSPACE_VISIBILITY_OPTIONS)
     win.show()
     win.focus()
+    win.webContents.send(PANEL_ANIMATION_CHANNEL, 'show')
     this.options.onVisibilityChanged()
     fadeIn(win)
   }
@@ -81,13 +89,11 @@ export class PanelController {
       this.mainWindow = win
       win.once('ready-to-show', () => {
         if (this.mainWindow !== win || win.isDestroyed()) return
-        this.positionAtScreenCenter(win)
         this.showWindow(win)
       })
       return
     }
 
-    this.positionAtScreenCenter()
     this.show()
   }
 
@@ -97,6 +103,7 @@ export class PanelController {
     this.panelVisible = false
     this.options.onVisibilityChanged()
     const win = this.mainWindow
+    win.webContents.send(PANEL_ANIMATION_CHANNEL, 'hide')
     fadeOut(win, () => {
       if (!win.isDestroyed()) {
         win.hide()
@@ -124,6 +131,10 @@ export class PanelController {
       height: PANEL_HEIGHT,
       show: false,
       frame: false,
+      transparent: true,
+      backgroundColor: '#00000000',
+      vibrancy: 'popover',
+      visualEffectState: 'active',
       hasShadow: true,
       roundedCorners: true,
       resizable: false,
@@ -186,14 +197,13 @@ export class PanelController {
     }, AUTO_HIDE_ON_BLUR_DELAY_MS)
   }
 
-  private positionAtScreenCenter(win = this.mainWindow): void {
-    if (!win || win.isDestroyed()) return
+  private getCenteredBounds(): PanelBounds {
     const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint())
     const workArea = display.workArea
 
     const x = Math.round(workArea.x + (workArea.width - PANEL_WIDTH) / 2)
     const y = Math.round(workArea.y + (workArea.height - PANEL_HEIGHT) / 2)
 
-    win.setPosition(x, y)
+    return { x, y, width: PANEL_WIDTH, height: PANEL_HEIGHT }
   }
 }

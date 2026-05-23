@@ -1,34 +1,28 @@
 # Summon
 
-macOS app for switching between Ghostty terminal windows.
+Summon is a macOS menu bar switcher for jumping between Ghostty windows.
 
-Requires macOS + Ghostty.
+Requires Ghostty.
 
-## Development
+## Core features
+
+- Show open Ghostty windows with current directory, tab count, and Git repository context.
+- Jump to a window by click, keyboard navigation, or ⌘1–⌘9.
+- Create a new Ghostty window with ⌘N or from the menu bar.
+- Toggle the panel with a configurable global shortcut.
+- Switch appearance and UI language from the menu bar.
+
+## Build & install (macOS)
+
+```bash
+./install.sh
+```
+
+Builds a host-architecture `.app` and installs it to `~/Applications`.
+
+## Develop
 
 ```bash
 bun install
 bun run dev
-```
-
-## Build
-
-```bash
-bun run build
-```
-
-## Usage
-
-Unsigned app. First run:
-
-```bash
-xattr -cr /Applications/Summon.app
-```
-
-Or: **Right-click → Open → Open** ([Apple docs](https://support.apple.com/guide/mac-help/mh40616/mac))
-
-## Install
-
-```bash
-./install.sh
 ```

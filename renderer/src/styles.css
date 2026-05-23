@@ -5,24 +5,24 @@
 
 :root {
   --radius: 0.5rem;
-  --macos-blue: #007aff;
-  --macos-blue-pressed: #0067d8;
+  --macos-blue: #006edb;
+  --macos-blue-pressed: #0060c9;
   --macos-green: #34c759;
   --macos-red: #ff3b30;
   --macos-label: #1d1d1f;
   --macos-secondary-label: #6e6e73;
   --macos-tertiary-label: #8a8a8e;
-  --macos-separator: rgba(60, 60, 67, 0.18);
-  --macos-surface-base: #ececf0;
-  --macos-surface-raised: rgba(255, 255, 255, 0.84);
-  --macos-surface-row: rgba(255, 255, 255, 0.78);
-  --macos-surface-row-hover: rgba(255, 255, 255, 0.94);
-  --macos-surface-control: rgba(118, 118, 128, 0.12);
-  --macos-surface-control-hover: rgba(118, 118, 128, 0.18);
+  --macos-separator: rgba(60, 60, 67, 0.1);
+  --macos-surface-base: rgba(236, 236, 240, 0.72);
+  --macos-surface-raised: rgba(255, 255, 255, 0.72);
+  --macos-surface-row: rgba(255, 255, 255, 0.58);
+  --macos-surface-row-hover: rgba(255, 255, 255, 0.78);
+  --macos-surface-control: rgba(118, 118, 128, 0.14);
+  --macos-surface-control-hover: rgba(118, 118, 128, 0.2);
   --macos-surface-control-selected: rgba(0, 122, 255, 0.13);
   --macos-surface-control-selected-hover: rgba(0, 122, 255, 0.18);
-  --macos-surface-selected: rgba(0, 122, 255, 0.16);
-  --macos-surface-selected-hover: rgba(0, 122, 255, 0.2);
+  --macos-surface-selected: rgba(0, 122, 255, 0.18);
+  --macos-surface-selected-hover: rgba(0, 122, 255, 0.23);
   --macos-surface-pressed: rgba(0, 0, 0, 0.06);
   --macos-scrollbar-thumb: rgba(60, 60, 67, 0.4);
   --macos-scrollbar-thumb-hover: rgba(60, 60, 67, 0.7);
@@ -30,9 +30,11 @@
   --macos-popover: var(--macos-surface-raised);
   --macos-shadow-panel-list: 0 10px 28px rgba(0, 0, 0, 0.12);
   --macos-shadow-status-live: 0 0 8px rgba(52, 199, 89, 0.45);
+  --macos-panel-border: rgba(0, 0, 0, 0.06);
+  --macos-panel-shadow: 0 18px 48px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.26);
   --panel-background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0) 120px),
-    linear-gradient(135deg, #f6f6f8 0%, #ececf0 48%, #f9f9fb 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.68) 0%, rgba(255, 255, 255, 0.3) 120px),
+    linear-gradient(135deg, rgba(246, 246, 248, 0.66) 0%, rgba(236, 236, 240, 0.56) 48%, rgba(249, 249, 251, 0.64) 100%);
   --background: var(--macos-surface-base);
   --foreground: var(--macos-label);
   --card: var(--macos-surface-row);
@@ -55,7 +57,7 @@
   --input: rgba(118, 118, 128, 0.2);
   --ring: var(--macos-blue);
   --separator: var(--macos-separator);
-  --list: rgba(255, 255, 255, 0.2);
+  --list: rgba(255, 255, 255, 0.14);
   --row: var(--macos-surface-row);
   --row-hover: var(--macos-surface-row-hover);
   --row-selected: var(--macos-surface-selected);
@@ -72,34 +74,36 @@
 }
 
 .dark {
-  --macos-blue: #006edb;
-  --macos-blue-pressed: #007aff;
+  --macos-blue: #006fd6;
+  --macos-blue-pressed: #0a84ff;
   --macos-green: #30d158;
   --macos-red: #ff453a;
-  --macos-label: #f5f5f7;
-  --macos-secondary-label: #aeaeb2;
-  --macos-tertiary-label: #8e8e93;
-  --macos-separator: rgba(84, 84, 88, 0.48);
-  --macos-surface-base: #1c1c1e;
-  --macos-surface-raised: rgba(44, 44, 46, 0.86);
-  --macos-surface-row: rgba(44, 44, 46, 0.78);
-  --macos-surface-row-hover: rgba(58, 58, 60, 0.92);
-  --macos-surface-control: rgba(120, 120, 128, 0.24);
-  --macos-surface-control-hover: rgba(120, 120, 128, 0.32);
-  --macos-surface-control-selected: rgba(10, 132, 255, 0.2);
-  --macos-surface-control-selected-hover: rgba(10, 132, 255, 0.27);
-  --macos-surface-selected: rgba(10, 132, 255, 0.24);
-  --macos-surface-selected-hover: rgba(10, 132, 255, 0.3);
-  --macos-surface-pressed: rgba(255, 255, 255, 0.08);
-  --macos-scrollbar-thumb: rgba(142, 142, 147, 0.4);
-  --macos-scrollbar-thumb-hover: rgba(142, 142, 147, 0.7);
-  --macos-scrollbar-thumb-active: rgba(142, 142, 147, 0.8);
+  --macos-label: #f7f7f8;
+  --macos-secondary-label: #b8b8bf;
+  --macos-tertiary-label: #85858c;
+  --macos-separator: rgba(255, 255, 255, 0.06);
+  --macos-surface-base: rgba(15, 15, 17, 0.72);
+  --macos-surface-raised: rgba(29, 29, 32, 0.7);
+  --macos-surface-row: rgba(34, 34, 38, 0.54);
+  --macos-surface-row-hover: rgba(48, 48, 54, 0.74);
+  --macos-surface-control: rgba(118, 118, 128, 0.18);
+  --macos-surface-control-hover: rgba(118, 118, 128, 0.26);
+  --macos-surface-control-selected: rgba(0, 112, 224, 0.24);
+  --macos-surface-control-selected-hover: rgba(0, 122, 255, 0.3);
+  --macos-surface-selected: rgba(0, 112, 224, 0.34);
+  --macos-surface-selected-hover: rgba(0, 122, 255, 0.42);
+  --macos-surface-pressed: rgba(255, 255, 255, 0.06);
+  --macos-scrollbar-thumb: rgba(142, 142, 147, 0.32);
+  --macos-scrollbar-thumb-hover: rgba(142, 142, 147, 0.56);
+  --macos-scrollbar-thumb-active: rgba(142, 142, 147, 0.68);
   --macos-popover: var(--macos-surface-raised);
-  --macos-shadow-panel-list: 0 12px 32px rgba(0, 0, 0, 0.34);
+  --macos-shadow-panel-list: 0 14px 36px rgba(0, 0, 0, 0.38);
   --macos-shadow-status-live: 0 0 8px rgba(48, 209, 88, 0.45);
+  --macos-panel-border: rgba(255, 255, 255, 0.065);
+  --macos-panel-shadow: 0 24px 70px rgba(0, 0, 0, 0.46), inset 0 1px 0 rgba(255, 255, 255, 0.1);
   --panel-background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0) 120px),
-    linear-gradient(135deg, #2c2c2e 0%, #1c1c1e 52%, #171719 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.01) 120px),
+    linear-gradient(135deg, rgba(30, 30, 34, 0.78) 0%, rgba(18, 18, 21, 0.68) 52%, rgba(10, 10, 12, 0.72) 100%);
   --background: var(--macos-surface-base);
   --foreground: var(--macos-label);
   --card: var(--macos-surface-row);
@@ -119,7 +123,7 @@
   --destructive: var(--macos-red);
   --destructive-foreground: #ffffff;
   --border: var(--macos-separator);
-  --input: rgba(120, 120, 128, 0.36);
+  --input: rgba(120, 120, 128, 0.3);
   --ring: var(--macos-blue);
   --separator: var(--macos-separator);
   --list: rgba(0, 0, 0, 0.08);
@@ -186,7 +190,8 @@
   html,
   body,
   #root {
-    @apply bg-background text-foreground font-sans;
+    @apply text-foreground font-sans;
+    background: transparent;
     height: 100%;
     overflow: hidden;
     transition:
@@ -222,6 +227,31 @@
 
 .macos-panel {
   background: var(--panel-background);
+  border: 1px solid var(--macos-panel-border);
+  box-shadow: var(--macos-panel-shadow);
+  -webkit-backdrop-filter: blur(34px) saturate(1.55);
+  backdrop-filter: blur(34px) saturate(1.55);
+}
+
+.panel-surface {
+  transform-origin: top center;
+  transition:
+    opacity 120ms cubic-bezier(0.2, 0, 0, 1),
+    transform 140ms cubic-bezier(0.2, 0, 0, 1);
+  will-change: opacity, transform;
+}
+
+.panel-surface-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.panel-surface-hide {
+  pointer-events: none;
+  opacity: 0.96;
+  transform: translateY(3px) scale(0.985);
+  transition-duration: 90ms;
+  transition-timing-function: cubic-bezier(0.32, 0, 0.67, 0);
 }
 
 @keyframes pulse-dot {

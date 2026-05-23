@@ -22,8 +22,8 @@ const shortcutLabels: Record<ShortcutAccelerator, string> = {
   'Option+Space': '⌥ Space',
   'Option+Tab': '⌥ Tab',
   'Command+Shift+Space': '⌘ ⇧ Space',
-  'Control+Space': '⌃ Space',
-  'Command+Space': '⌘ Space',
+  'Command+Option+Space': '⌘ ⌥ Space',
+  'Control+Option+Space': '⌃ ⌥ Space',
 }
 
 type TrayLabelKey = keyof (typeof i18nResources)[typeof defaultLanguage]['translation']['tray']
@@ -213,18 +213,23 @@ export class TrayMenuController {
       { type: 'separator' },
       { label: label('appearance'), submenu: themeItems },
       { label: label('language'), submenu: languageItems },
-      { type: 'separator' },
       { label: label('shortcut'), submenu: shortcutItems },
-      {
-        label: label('github'),
-        click: async () => {
-          await shell.openExternal(GITHUB_URL)
-        },
-      },
       { type: 'separator' },
       {
-        label: this.versionBuildLabel(language),
-        enabled: false,
+        label: label('about'),
+        submenu: [
+          {
+            label: this.versionBuildLabel(language),
+            enabled: false,
+          },
+          { type: 'separator' },
+          {
+            label: label('github'),
+            click: async () => {
+              await shell.openExternal(GITHUB_URL)
+            },
+          },
+        ],
       },
       { type: 'separator' },
       { label: label('quit'), role: 'quit' },

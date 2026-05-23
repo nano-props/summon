@@ -7,8 +7,8 @@ describe('SHORTCUT_ACCELERATORS', () => {
       'Option+Space',
       'Option+Tab',
       'Command+Shift+Space',
-      'Control+Space',
-      'Command+Space',
+      'Command+Option+Space',
+      'Control+Option+Space',
     ])
     expect(new Set(SHORTCUT_ACCELERATORS).size).toBe(SHORTCUT_ACCELERATORS.length)
   })

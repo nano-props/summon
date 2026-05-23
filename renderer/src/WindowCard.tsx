@@ -36,10 +36,10 @@ export function WindowCard({ window: w, index, selected }: WindowCardProps) {
     <button
       type="button"
       className={cn(
-        'relative group w-full appearance-none bg-row text-left text-card-foreground border-b border-separator px-5 py-2.5 flex items-center gap-3 cursor-pointer transition-colors backdrop-blur-sm outline-none',
+        'relative group w-full appearance-none bg-row text-left text-card-foreground px-5 py-2 flex items-center gap-3 cursor-pointer transition-colors backdrop-blur-sm outline-none shadow-[inset_0_-1px_0_var(--separator)]',
         'hover:bg-row-hover',
-        'last:border-b-0',
-        selected && 'bg-row-selected border-transparent hover:bg-row-selected-hover',
+        'last:shadow-none',
+        selected && 'bg-row-selected shadow-none hover:bg-row-selected-hover',
       )}
       onClick={handleClick}
       onPointerDown={handlePointerDown}

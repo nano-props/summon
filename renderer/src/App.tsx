@@ -1,8 +1,9 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutGrid } from 'lucide-react'
 import { Header } from '#/renderer/src/Header.tsx'
 import { useStore } from '#/renderer/src/store.ts'
+import type { PanelAnimationPhase } from '#/renderer/src/types.ts'
 import { useKeyboardNav } from '#/renderer/src/useKeyboardNav.ts'
 import { WindowCard } from '#/renderer/src/WindowCard.tsx'
 
@@ -14,6 +15,7 @@ export function App() {
   const fetchWindows = useStore((s) => s.fetchWindows)
   const hydrate = useStore((s) => s.hydrate)
   const syncPrefs = useStore((s) => s.syncPrefs)
+  const [panelAnimation, setPanelAnimation] = useState<PanelAnimationPhase>('hide')
 
   useEffect(() => {
     hydrate()
@@ -23,6 +25,7 @@ export function App() {
   }, [fetchWindows, hydrate])
 
   useEffect(() => window.summonAPI.onPrefsChanged(syncPrefs), [syncPrefs])
+  useEffect(() => window.summonAPI.onPanelAnimation(setPanelAnimation), [])
 
   useEffect(() => {
     window.addEventListener('focus', fetchWindows)
@@ -61,18 +64,20 @@ export function App() {
   }, [selectedIndex, windows])
 
   return (
-    <div className="relative h-full flex flex-col rounded-[14px] overflow-hidden select-none macos-panel text-foreground">
+    <div
+      className={`relative h-full flex flex-col rounded-[14px] overflow-hidden select-none macos-panel panel-surface panel-surface-${panelAnimation} text-foreground`}
+    >
       <Header />
 
       <div className="custom-scrollbar flex-1 overflow-y-auto">
         {windows.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center py-12 px-5 text-muted-foreground text-sm gap-2">
+          <div className="flex flex-col items-center justify-center text-center py-10 px-5 text-muted-foreground text-sm gap-2">
             <LayoutGrid className="size-7 opacity-30" />
             <div>{t('empty.no-windows')}</div>
             <div className="text-xs text-tertiary-foreground">{t('empty.new-terminal-hint')}</div>
           </div>
         ) : (
-          <div ref={listRef} className="flex flex-col bg-list border-b border-separator overflow-hidden">
+          <div ref={listRef} className="flex flex-col bg-list overflow-hidden">
             {windows.map((w, i) => (
               <WindowCard key={w.key} window={w} index={i} selected={i === selectedIndex} />
             ))}

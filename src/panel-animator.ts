@@ -1,8 +1,9 @@
 import type { BrowserWindow } from 'electron/main'
 
-const ANIM_DURATION = 100 // ms
+const SHOW_DURATION = 140
+const HIDE_DURATION = 90
 const ANIM_INTERVAL = 16 // ~60fps
-const easeOut = (t: number) => 1 - (1 - t) * (1 - t)
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 3)
 const easeIn = (t: number) => t * t
 
 let animTimer: ReturnType<typeof setInterval> | null = null
@@ -16,21 +17,23 @@ export function stopAnimation(): void {
 
 function animateOpacity(
   win: BrowserWindow,
-  from: number,
-  to: number,
+  fromOpacity: number,
+  toOpacity: number,
+  duration: number,
   easing: (t: number) => number,
   onComplete?: () => void,
 ): void {
   stopAnimation()
-  win.setOpacity(from)
+  win.setOpacity(fromOpacity)
   const start = Date.now()
   animTimer = setInterval(() => {
     if (win.isDestroyed()) {
       stopAnimation()
       return
     }
-    const t = Math.min((Date.now() - start) / ANIM_DURATION, 1)
-    win.setOpacity(from + (to - from) * easing(t))
+    const t = Math.min((Date.now() - start) / duration, 1)
+    const eased = easing(t)
+    win.setOpacity(fromOpacity + (toOpacity - fromOpacity) * eased)
     if (t >= 1) {
       stopAnimation()
       onComplete?.()
@@ -39,9 +42,9 @@ function animateOpacity(
 }
 
 export function fadeIn(win: BrowserWindow): void {
-  animateOpacity(win, 0, 1, easeOut)
+  animateOpacity(win, 0, 1, SHOW_DURATION, easeOut)
 }
 
 export function fadeOut(win: BrowserWindow, onComplete?: () => void): void {
-  animateOpacity(win, 1, 0, easeIn, onComplete)
+  animateOpacity(win, win.getOpacity(), 0, HIDE_DURATION, easeIn, onComplete)
 }

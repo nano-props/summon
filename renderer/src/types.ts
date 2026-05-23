@@ -23,6 +23,7 @@ export interface WindowsResponse {
 export type ThemeMode = 'light' | 'dark' | 'auto'
 export type Language = 'en' | 'zh' | 'ko' | 'ja'
 export type LanguageMode = 'auto' | Language
+export type PanelAnimationPhase = 'show' | 'hide'
 
 export interface Prefs {
   shortcutEnabled: boolean
@@ -38,6 +39,7 @@ export interface SummonAPI {
   newTerminal: () => Promise<{ ok: boolean; error?: string } | null>
   hidePanel: () => Promise<{ ok: boolean } | null>
   getPrefs: () => Promise<Prefs | null>
+  onPanelAnimation: (callback: (phase: PanelAnimationPhase) => void) => () => void
   onPrefsChanged: (callback: (prefs: Prefs) => void) => () => void
 }
 
