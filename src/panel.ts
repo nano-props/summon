@@ -8,6 +8,7 @@ const WORKSPACE_VISIBILITY_OPTIONS = {
 } as const
 const PANEL_WIDTH = 560
 const PANEL_HEIGHT = 380
+const AUTO_HIDE_ON_BLUR_DELAY_MS = 100
 
 interface PanelControllerOptions {
   isDev: boolean
@@ -20,6 +21,7 @@ interface PanelControllerOptions {
 export class PanelController {
   private mainWindow: BrowserWindow | null = null
   private panelVisible = false
+  private blurHideTimer: ReturnType<typeof setTimeout> | null = null
   private readonly options: PanelControllerOptions
 
   constructor(options: PanelControllerOptions) {
@@ -63,6 +65,7 @@ export class PanelController {
 
   private showWindow(win: BrowserWindow): void {
     if (win.isDestroyed()) return
+    this.clearBlurHideTimer()
     this.panelVisible = true
     win.setOpacity(0)
     win.setVisibleOnAllWorkspaces(true, WORKSPACE_VISIBILITY_OPTIONS)
@@ -90,6 +93,7 @@ export class PanelController {
 
   hide(): void {
     if (!this.mainWindow || this.mainWindow.isDestroyed() || !this.panelVisible) return
+    this.clearBlurHideTimer()
     this.panelVisible = false
     this.options.onVisibilityChanged()
     const win = this.mainWindow
@@ -103,6 +107,7 @@ export class PanelController {
 
   dispose(): void {
     stopAnimation()
+    this.clearBlurHideTimer()
     const wasVisible = this.panelVisible
     this.panelVisible = false
     if (this.mainWindow && !this.mainWindow.isDestroyed()) {
@@ -147,8 +152,16 @@ export class PanelController {
       e.preventDefault()
       this.hide()
     })
+    win.on('blur', () => {
+      this.clearBlurHideTimer()
+      this.scheduleBlurHide(win)
+    })
+    win.on('focus', () => {
+      this.clearBlurHideTimer()
+    })
     win.on('closed', () => {
       if (this.mainWindow !== win) return
+      this.clearBlurHideTimer()
       const wasVisible = this.panelVisible
       this.mainWindow = null
       this.panelVisible = false
@@ -156,6 +169,21 @@ export class PanelController {
     })
 
     return win
+  }
+
+  private clearBlurHideTimer(): void {
+    if (!this.blurHideTimer) return
+    clearTimeout(this.blurHideTimer)
+    this.blurHideTimer = null
+  }
+
+  private scheduleBlurHide(win: BrowserWindow): void {
+    this.blurHideTimer = setTimeout(() => {
+      this.blurHideTimer = null
+      if (win.isDestroyed() || this.mainWindow !== win) return
+      if (!this.panelVisible || win.isFocused()) return
+      this.hide()
+    }, AUTO_HIDE_ON_BLUR_DELAY_MS)
   }
 
   private positionAtScreenCenter(win = this.mainWindow): void {

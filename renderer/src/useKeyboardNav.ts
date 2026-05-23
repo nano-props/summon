@@ -27,6 +27,33 @@ function moveIndex(selectedIndex: number, length: number, delta: number) {
   return (selectedIndex + delta + length) % length
 }
 
+async function newTerminal(): Promise<void> {
+  try {
+    const result = await window.summonAPI.newTerminal()
+    if (!result?.ok) console.error('New terminal failed:', result?.error ?? 'unknown error')
+  } catch (error) {
+    console.error('New terminal failed:', error)
+  }
+}
+
+async function hidePanel(): Promise<void> {
+  try {
+    const result = await window.summonAPI.hidePanel()
+    if (!result?.ok) console.error('Hide panel failed')
+  } catch (error) {
+    console.error('Hide panel failed:', error)
+  }
+}
+
+async function activateWindow(targetWindow: WindowDTO): Promise<void> {
+  try {
+    const result = await window.summonAPI.activateWindow(targetWindow.id, targetWindow.terminalId)
+    if (!result?.ok) console.error('Activate failed:', result?.error ?? 'unknown error')
+  } catch (error) {
+    console.error('Activate failed:', error)
+  }
+}
+
 export function useKeyboardNav(windowsRef: React.RefObject<WindowDTO[]>) {
   useEffect(() => {
     const onFocus = () => {
@@ -48,25 +75,25 @@ export function useKeyboardNav(windowsRef: React.RefObject<WindowDTO[]>) {
           if (idx >= 0 && idx < list.length) {
             e.preventDefault()
             flashItem(list[idx].key)
-            useStore.getState().activateWindow(list[idx])
+            void activateWindow(list[idx])
           }
           return
         }
         if (key === 'n') {
           e.preventDefault()
-          window.summonAPI.newTerminal()
+          void newTerminal()
           return
         }
       }
 
       if (e.key === 'Escape') {
-        window.summonAPI.hidePanel()
+        void hidePanel()
         return
       }
 
       if (closest(e.target, INTERACTIVE_SELECTOR) && !closest(e.target, WINDOW_ROW_SELECTOR)) return
 
-      const { selectedIndex, setSelectedIndex, activateWindow } = useStore.getState()
+      const { selectedIndex, setSelectedIndex } = useStore.getState()
       const list = windowsRef.current!
       if (e.key === 'ArrowDown') {
         e.preventDefault()
@@ -88,7 +115,7 @@ export function useKeyboardNav(windowsRef: React.RefObject<WindowDTO[]>) {
         if (selectedIndex >= 0 && selectedIndex < list.length) {
           e.preventDefault()
           flashItem(list[selectedIndex].key)
-          activateWindow(list[selectedIndex])
+          void activateWindow(list[selectedIndex])
         }
       }
     }

@@ -4,6 +4,13 @@ cd "$(dirname "$0")" || exit 1
 
 APP_NAME=Summon
 DEST="$HOME/Applications"
+ARCH="$(uname -m)"
+
+if [ "$ARCH" = "arm64" ]; then
+  APP_DIR_CANDIDATES=("dist/mac-arm64" "dist/mac")
+else
+  APP_DIR_CANDIDATES=("dist/mac-x64" "dist/mac")
+fi
 
 WAS_RUNNING=false
 if pgrep -f "$APP_NAME.app" > /dev/null; then
@@ -21,10 +28,20 @@ echo "Packaging..."
 bunx electron-builder --mac --dir
 
 echo "Installing to $DEST..."
+APP_DIR=""
+for candidate in "${APP_DIR_CANDIDATES[@]}"; do
+  if [ -d "$candidate/$APP_NAME.app" ]; then
+    APP_DIR="$candidate"
+    break
+  fi
+done
+if [ -z "$APP_DIR" ]; then
+  echo "Error: packaged app not found for $ARCH"
+  exit 1
+fi
 mkdir -p "$DEST"
 rm -rf "$DEST/$APP_NAME.app"
-cp -R "dist/mac-arm64/$APP_NAME.app" "$DEST/" 2>/dev/null \
-  || cp -R "dist/mac/$APP_NAME.app" "$DEST/"
+cp -R "$APP_DIR/$APP_NAME.app" "$DEST/"
 
 echo "Installed: $DEST/$APP_NAME.app"
 
