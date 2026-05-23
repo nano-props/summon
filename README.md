@@ -20,6 +20,18 @@ Requires Ghostty.
 
 Builds a host-architecture `.app` and installs it to `~/Applications`.
 
+## Using a prebuilt download
+
+After downloading the prebuilt app, move `Summon.app` to `~/Applications`.
+
+Because the app is not signed, macOS may block it the first time you open it. If that happens, clear the quarantine flag once:
+
+```bash
+xattr -cr ~/Applications/Summon.app
+```
+
+Alternatively, open it via **Right-click → Open → Open**. See Apple's guide: <https://support.apple.com/guide/mac-help/mh40616/mac>.
+
 ## Develop
 
 ```bash
