@@ -1,33 +1,34 @@
 import type { StateCreator } from 'zustand'
-import { isEqual } from 'lodash-es'
+import { summonClient } from '#/renderer/src/data/summon-client.ts'
 import type { SummonState, WindowsSlice } from '#/renderer/src/store/types.ts'
-import type { WindowsResponse } from '#/renderer/src/types.ts'
+import type { WindowDto, WindowsState } from '#/src/shared/contracts.ts'
 
-let lastData: WindowsResponse | null = null
+function cloneWindow(window: WindowDto): WindowDto {
+  return { ...window, gitRepo: window.gitRepo ? { ...window.gitRepo } : null }
+}
 
-export const createWindowsSlice: StateCreator<SummonState, [], [], WindowsSlice> = (set) => {
+export const createWindowsSlice: StateCreator<SummonState, [], [], WindowsSlice> = (set, get) => {
+  const syncWindows = (state: WindowsState) => {
+    if (state.version <= get().windowsVersion) return
+    set({ windowsVersion: state.version, windows: state.windows.map(cloneWindow) })
+  }
+
   return {
+    windowsVersion: -1,
     windows: [],
 
-    fetchWindows: async () => {
+    loadWindows: async () => {
       try {
-        const data = await window.summonAPI.getWindows()
+        const data = await summonClient.getWindows()
         if (!data) return
-        if (isEqual(data, lastData)) return
-        lastData = data
-        set({ windows: data.windows })
+        syncWindows(data)
       } catch (e) {
-        console.error('Failed to fetch:', e)
+        console.error('Failed to load windows:', e)
       }
     },
 
-    activateWindow: async (window) => {
-      try {
-        const result = await globalThis.window.summonAPI.activateWindow(window.id, window.terminalId)
-        if (!result?.ok) console.error('Activate failed:', result?.error ?? 'unknown error')
-      } catch (e) {
-        console.error('Activate failed:', e)
-      }
-    },
+    syncWindows,
+
+    activateWindow: (window) => summonClient.activateWindow(window),
   }
 }

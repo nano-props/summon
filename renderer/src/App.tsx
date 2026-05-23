@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { LayoutGrid } from 'lucide-react'
+import { summonClient } from '#/renderer/src/data/summon-client.ts'
 import { Header } from '#/renderer/src/Header.tsx'
 import { useStore } from '#/renderer/src/store.ts'
-import type { PanelAnimationPhase } from '#/renderer/src/types.ts'
+import type { PanelAnimationPhase } from '#/src/shared/contracts.ts'
 import { useKeyboardNav } from '#/renderer/src/useKeyboardNav.ts'
 import { WindowCard } from '#/renderer/src/WindowCard.tsx'
 
@@ -12,25 +13,29 @@ export function App() {
   const windows = useStore((s) => s.windows)
   const selectedIndex = useStore((s) => s.selectedIndex)
   const setSelectedIndex = useStore((s) => s.setSelectedIndex)
-  const fetchWindows = useStore((s) => s.fetchWindows)
+  const loadWindows = useStore((s) => s.loadWindows)
+  const syncWindows = useStore((s) => s.syncWindows)
   const hydrate = useStore((s) => s.hydrate)
   const syncPrefs = useStore((s) => s.syncPrefs)
   const [panelAnimation, setPanelAnimation] = useState<PanelAnimationPhase>('hide')
 
   useEffect(() => {
-    hydrate()
-    fetchWindows()
-    const timer = setInterval(fetchWindows, 2000)
-    return () => clearInterval(timer)
-  }, [fetchWindows, hydrate])
-
-  useEffect(() => window.summonAPI.onPrefsChanged(syncPrefs), [syncPrefs])
-  useEffect(() => window.summonAPI.onPanelAnimation(setPanelAnimation), [])
+    void hydrate()
+    void loadWindows()
+    return summonClient.onWindowsChanged(syncWindows)
+  }, [hydrate, loadWindows, syncWindows])
 
   useEffect(() => {
-    window.addEventListener('focus', fetchWindows)
-    return () => window.removeEventListener('focus', fetchWindows)
-  }, [fetchWindows])
+    return summonClient.onPrefsChanged(syncPrefs)
+  }, [syncPrefs])
+  useEffect(() => {
+    return summonClient.onPanelAnimation(setPanelAnimation)
+  }, [setPanelAnimation])
+
+  useEffect(() => {
+    window.addEventListener('focus', loadWindows)
+    return () => window.removeEventListener('focus', loadWindows)
+  }, [loadWindows])
 
   const windowsRef = useRef(windows)
   windowsRef.current = windows
@@ -79,7 +84,7 @@ export function App() {
         ) : (
           <div ref={listRef} className="flex flex-col bg-list overflow-hidden">
             {windows.map((w, i) => (
-              <WindowCard key={w.key} window={w} index={i} selected={i === selectedIndex} />
+              <WindowCard key={w.id} window={w} index={i} selected={i === selectedIndex} />
             ))}
           </div>
         )}

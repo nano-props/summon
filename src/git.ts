@@ -1,12 +1,7 @@
 import { execa } from 'execa'
 import QuickLRU from 'quick-lru'
 import path from 'node:path'
-
-export interface GitRepoInfo {
-  root: string
-  rootName: string
-  isRoot: boolean
-}
+import type { GitRepoInfo } from '#/src/shared/contracts.ts'
 
 const CACHE_TTL_MS = 10_000
 const CACHE_TARGET_ENTRIES = 200

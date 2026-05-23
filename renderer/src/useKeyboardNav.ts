@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { flashItem } from '#/renderer/src/flash-item.ts'
 import { useStore } from '#/renderer/src/store.ts'
-import type { WindowDTO } from '#/renderer/src/types.ts'
+import type { WindowDto } from '#/src/shared/contracts.ts'
 
 // ⌘1–⌘9  →  index 0-8
 const SHORTCUT_KEYS = '123456789'
@@ -27,34 +27,7 @@ function moveIndex(selectedIndex: number, length: number, delta: number) {
   return (selectedIndex + delta + length) % length
 }
 
-async function newTerminal(): Promise<void> {
-  try {
-    const result = await window.summonAPI.newTerminal()
-    if (!result?.ok) console.error('New terminal failed:', result?.error ?? 'unknown error')
-  } catch (error) {
-    console.error('New terminal failed:', error)
-  }
-}
-
-async function hidePanel(): Promise<void> {
-  try {
-    const result = await window.summonAPI.hidePanel()
-    if (!result?.ok) console.error('Hide panel failed')
-  } catch (error) {
-    console.error('Hide panel failed:', error)
-  }
-}
-
-async function activateWindow(targetWindow: WindowDTO): Promise<void> {
-  try {
-    const result = await window.summonAPI.activateWindow(targetWindow.id, targetWindow.terminalId)
-    if (!result?.ok) console.error('Activate failed:', result?.error ?? 'unknown error')
-  } catch (error) {
-    console.error('Activate failed:', error)
-  }
-}
-
-export function useKeyboardNav(windowsRef: React.RefObject<WindowDTO[]>) {
+export function useKeyboardNav(windowsRef: React.RefObject<WindowDto[]>) {
   useEffect(() => {
     const onFocus = () => {
       const list = windowsRef.current!
@@ -74,20 +47,20 @@ export function useKeyboardNav(windowsRef: React.RefObject<WindowDTO[]>) {
           const idx = SHORTCUT_KEYS.indexOf(key)
           if (idx >= 0 && idx < list.length) {
             e.preventDefault()
-            flashItem(list[idx].key)
-            void activateWindow(list[idx])
+            flashItem(list[idx].id)
+            void useStore.getState().activateWindow(list[idx])
           }
           return
         }
         if (key === 'n') {
           e.preventDefault()
-          void newTerminal()
+          void useStore.getState().newTerminal()
           return
         }
       }
 
       if (e.key === 'Escape') {
-        void hidePanel()
+        void useStore.getState().hidePanel()
         return
       }
 
@@ -114,8 +87,8 @@ export function useKeyboardNav(windowsRef: React.RefObject<WindowDTO[]>) {
         if (closest(e.target, WINDOW_ROW_SELECTOR)) return
         if (selectedIndex >= 0 && selectedIndex < list.length) {
           e.preventDefault()
-          flashItem(list[selectedIndex].key)
-          void activateWindow(list[selectedIndex])
+          flashItem(list[selectedIndex].id)
+          void useStore.getState().activateWindow(list[selectedIndex])
         }
       }
     }

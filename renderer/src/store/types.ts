@@ -1,4 +1,13 @@
-import type { Language, LanguageMode, Prefs, ShortcutAccelerator, ThemeMode, WindowDTO } from '#/renderer/src/types.ts'
+import type {
+  CommandResult,
+  Language,
+  LanguageMode,
+  Prefs,
+  ShortcutAccelerator,
+  ThemeMode,
+  WindowDto,
+  WindowsState,
+} from '#/src/shared/contracts.ts'
 
 export interface UiSlice {
   selectedIndex: number
@@ -16,9 +25,16 @@ export interface PrefsSlice {
 }
 
 export interface WindowsSlice {
-  windows: WindowDTO[]
-  fetchWindows: () => Promise<void>
-  activateWindow: (window: WindowDTO) => Promise<void>
+  windowsVersion: number
+  windows: WindowDto[]
+  loadWindows: () => Promise<void>
+  syncWindows: (state: WindowsState) => void
+  activateWindow: (window: WindowDto) => Promise<CommandResult>
 }
 
-export type SummonState = UiSlice & PrefsSlice & WindowsSlice
+export interface CommandsSlice {
+  newTerminal: () => Promise<CommandResult>
+  hidePanel: () => Promise<CommandResult>
+}
+
+export type SummonState = UiSlice & PrefsSlice & WindowsSlice & CommandsSlice

@@ -1,6 +1,7 @@
 import { BrowserWindow, screen } from 'electron/main'
 import { fadeIn, fadeOut, stopAnimation } from '#/src/panel-animator.ts'
-import type { Prefs } from '#/src/prefs.ts'
+import type { Prefs, WindowsState } from '#/src/shared/contracts.ts'
+import { RENDERER_CHANNELS } from '#/src/shared/ipc.ts'
 
 const WORKSPACE_VISIBILITY_OPTIONS = {
   visibleOnFullScreen: false,
@@ -9,7 +10,6 @@ const WORKSPACE_VISIBILITY_OPTIONS = {
 const PANEL_WIDTH = 600
 const PANEL_HEIGHT = 360
 const AUTO_HIDE_ON_BLUR_DELAY_MS = 100
-const PANEL_ANIMATION_CHANNEL = 'panel-animation'
 
 interface PanelControllerOptions {
   isDev: boolean
@@ -42,7 +42,12 @@ export class PanelController {
 
   notifyPrefsChanged(prefs: Prefs): void {
     if (!this.mainWindow || this.mainWindow.isDestroyed()) return
-    this.mainWindow.webContents.send('prefs-changed', prefs)
+    this.mainWindow.webContents.send(RENDERER_CHANNELS.prefsChanged, prefs)
+  }
+
+  notifyWindowsChanged(state: WindowsState): void {
+    if (!this.mainWindow || this.mainWindow.isDestroyed()) return
+    this.mainWindow.webContents.send(RENDERER_CHANNELS.windowsChanged, state)
   }
 
   toggle(): void {
@@ -78,7 +83,7 @@ export class PanelController {
     win.setVisibleOnAllWorkspaces(true, WORKSPACE_VISIBILITY_OPTIONS)
     win.show()
     win.focus()
-    win.webContents.send(PANEL_ANIMATION_CHANNEL, 'show')
+    win.webContents.send(RENDERER_CHANNELS.panelAnimation, 'show')
     this.options.onVisibilityChanged()
     fadeIn(win)
   }
@@ -103,7 +108,8 @@ export class PanelController {
     this.panelVisible = false
     this.options.onVisibilityChanged()
     const win = this.mainWindow
-    win.webContents.send(PANEL_ANIMATION_CHANNEL, 'hide')
+    if (!win || win.isDestroyed()) return
+    win.webContents.send(RENDERER_CHANNELS.panelAnimation, 'hide')
     fadeOut(win, () => {
       if (!win.isDestroyed()) {
         win.hide()

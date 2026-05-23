@@ -7,7 +7,7 @@ import { PanelController } from '#/src/panel.ts'
 import { loadPrefs } from '#/src/prefs.ts'
 import { setShortcutEnabled, unregisterShortcuts } from '#/src/shortcut.ts'
 import { TrayMenuController } from '#/src/tray-menu.ts'
-import { refreshWindows } from '#/src/window-store.ts'
+import { refreshWindows, subscribeWindows } from '#/src/window-store.ts'
 
 const isDev = !app.isPackaged
 const DEV_RENDERER_URL = 'http://localhost:5173'
@@ -25,6 +25,7 @@ if (!app.requestSingleInstanceLock()) {
 let tray: Tray | null = null
 let refreshTimer: ReturnType<typeof setInterval> | null = null
 let trayMenu: TrayMenuController | null = null
+let unsubscribeWindows: (() => void) | null = null
 
 const panel = new PanelController({
   isDev,
@@ -59,6 +60,7 @@ app.whenReady().then(async () => {
     notifyPrefsChanged: (prefs) => panel.notifyPrefsChanged(prefs),
   })
   trayMenu.update()
+  unsubscribeWindows = subscribeWindows((state) => panel.notifyWindowsChanged(state))
 
   const prefs = loadPrefs()
   const shortcutOk = setShortcutEnabled(prefs.shortcutEnabled, prefs.shortcutAccelerator, () => panel.toggle())
@@ -75,6 +77,8 @@ app.on('second-instance', () => {
 app.on('before-quit', () => {
   unregisterShortcuts()
   if (refreshTimer) clearInterval(refreshTimer)
+  unsubscribeWindows?.()
+  unsubscribeWindows = null
   panel.dispose()
 })
 

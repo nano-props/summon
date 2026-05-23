@@ -3,18 +3,7 @@ import { readFileSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
 import writeFileAtomic from 'write-file-atomic'
 import { SHORTCUT_ACCELERATORS, type ShortcutAccelerator } from '#/src/shared/shortcuts.ts'
-
-export type ThemeMode = 'light' | 'dark' | 'auto'
-export type Language = 'en' | 'zh' | 'ko' | 'ja'
-export type LanguageMode = 'auto' | Language
-
-export interface Prefs {
-  shortcutEnabled: boolean
-  shortcutAccelerator: ShortcutAccelerator
-  theme: ThemeMode
-  language: LanguageMode
-  resolvedLanguage: Language
-}
+import type { Language, LanguageMode, Prefs, ThemeMode } from '#/src/shared/contracts.ts'
 
 interface StoredPrefs {
   shortcutEnabled: boolean

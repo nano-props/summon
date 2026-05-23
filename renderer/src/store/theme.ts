@@ -1,4 +1,4 @@
-import type { ThemeMode } from '#/renderer/src/types.ts'
+import type { ThemeMode } from '#/src/shared/contracts.ts'
 
 const systemDarkMQ = window.matchMedia('(prefers-color-scheme: dark)')
 

@@ -3,7 +3,8 @@ import { fileURLToPath } from 'node:url'
 import { activateWindow, newTerminal } from '#/src/ghostty.ts'
 import type { PanelController } from '#/src/panel.ts'
 import { loadPrefs } from '#/src/prefs.ts'
-import { getWindowDtos, hasWindowId } from '#/src/window-store.ts'
+import { IPC_CHANNELS } from '#/src/shared/ipc.ts'
+import { hasWindowId, refreshWindows } from '#/src/window-store.ts'
 
 interface RegisterIpcHandlersOptions {
   isDev: boolean
@@ -25,16 +26,21 @@ export function registerIpcHandlers(options: RegisterIpcHandlersOptions): void {
     }
   }
 
-  ipcMain.handle('get-windows', (event) => {
+  ipcMain.handle(IPC_CHANNELS.getWindows, async (event) => {
     if (!validateSender(event.senderFrame)) return null
-    return { windows: getWindowDtos() }
+    try {
+      return await refreshWindows()
+    } catch (e) {
+      console.error('get-windows failed:', e)
+      return null
+    }
   })
 
-  ipcMain.handle('activate-window', async (event, id: string, terminalId = '') => {
+  ipcMain.handle(IPC_CHANNELS.activateWindow, async (event, id: string, terminalId = '') => {
     if (!validateSender(event.senderFrame)) return null
     if (typeof id !== 'string') return { ok: false, error: 'Invalid window id' }
     if (typeof terminalId !== 'string') return { ok: false, error: 'Invalid terminal id' }
-    if (!hasWindowId(id)) return { ok: false }
+    if (!hasWindowId(id)) return { ok: false, error: 'Window not found' }
     try {
       await activateWindow(id, terminalId)
       options.panel.hide()
@@ -45,7 +51,7 @@ export function registerIpcHandlers(options: RegisterIpcHandlersOptions): void {
     }
   })
 
-  ipcMain.handle('new-terminal', async (event) => {
+  ipcMain.handle(IPC_CHANNELS.newTerminal, async (event) => {
     if (!validateSender(event.senderFrame)) return null
     try {
       await newTerminal()
@@ -57,14 +63,24 @@ export function registerIpcHandlers(options: RegisterIpcHandlersOptions): void {
     }
   })
 
-  ipcMain.handle('hide-panel', (event) => {
+  ipcMain.handle(IPC_CHANNELS.hidePanel, (event) => {
     if (!validateSender(event.senderFrame)) return null
-    options.panel.hide()
-    return { ok: true }
+    try {
+      options.panel.hide()
+      return { ok: true }
+    } catch (e) {
+      console.error('hide-panel failed:', e)
+      return { ok: false, error: e instanceof Error ? e.message : String(e) }
+    }
   })
 
-  ipcMain.handle('get-prefs', (event) => {
+  ipcMain.handle(IPC_CHANNELS.getPrefs, (event) => {
     if (!validateSender(event.senderFrame)) return null
-    return loadPrefs()
+    try {
+      return loadPrefs()
+    } catch (e) {
+      console.error('get-prefs failed:', e)
+      return null
+    }
   })
 }

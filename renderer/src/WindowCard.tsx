@@ -3,10 +3,10 @@ import { GitBranch } from 'lucide-react'
 import { pressItem, releaseItem } from '#/renderer/src/flash-item.ts'
 import { cn } from '#/renderer/src/lib/utils.ts'
 import { useStore } from '#/renderer/src/store.ts'
-import type { WindowDTO } from '#/renderer/src/types.ts'
+import type { WindowDto } from '#/src/shared/contracts.ts'
 
 interface WindowCardProps {
-  window: WindowDTO
+  window: WindowDto
   index: number
   selected?: boolean
 }
@@ -17,15 +17,15 @@ export function WindowCard({ window: w, index, selected }: WindowCardProps) {
   const setSelectedIndex = useStore((s) => s.setSelectedIndex)
 
   const handleClick = () => {
-    activateWindow(w)
+    void activateWindow(w)
   }
 
   const handlePointerDown = () => {
-    pressItem(w.key)
+    pressItem(w.id)
   }
 
   const handlePointerRelease = () => {
-    releaseItem(w.key)
+    releaseItem(w.id)
   }
 
   const dirName = w.cwd ? w.cwd.split('/').pop() || w.cwd : t('window.no-path')
@@ -47,7 +47,7 @@ export function WindowCard({ window: w, index, selected }: WindowCardProps) {
       onPointerCancel={handlePointerRelease}
       onPointerLeave={handlePointerRelease}
       onFocus={() => setSelectedIndex(index)}
-      data-id={w.key}
+      data-id={w.id}
       data-window-row
       aria-selected={selected}
       tabIndex={selected ? 0 : -1}
