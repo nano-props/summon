@@ -15,7 +15,7 @@ Requires Ghostty.
 ## Build & install (macOS)
 
 ```bash
-./install.sh
+./install.ts
 ```
 
 Builds a host-architecture `.app` and installs it to `~/Applications`.
