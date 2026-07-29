@@ -36,7 +36,7 @@
       }
 
       @media (prefers-color-scheme: dark) {
-        html:not([data-theme="light"]) {
+        html:not([data-theme='light']) {
           --bg: #111111;
           --bg-card: #1a1a1a;
           --text: #e8e5e0;
@@ -48,7 +48,7 @@
         }
       }
 
-      html[data-theme="dark"] {
+      html[data-theme='dark'] {
         --bg: #111111;
         --bg-card: #1a1a1a;
         --text: #e8e5e0;
@@ -89,13 +89,13 @@
       }
 
       @media (prefers-color-scheme: dark) {
-        html:not([data-theme="light"]) nav {
+        html:not([data-theme='light']) nav {
           background: rgba(17, 17, 17, 0.8);
           box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
         }
       }
 
-      html[data-theme="dark"] nav {
+      html[data-theme='dark'] nav {
         background: rgba(17, 17, 17, 0.8);
         box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
       }
@@ -161,7 +161,11 @@
         padding: 0 12px;
         height: 34px;
         cursor: pointer;
-        font: 600 12px/1 ui-monospace, 'SF Mono', Menlo, monospace;
+        font:
+          600 12px/1 ui-monospace,
+          'SF Mono',
+          Menlo,
+          monospace;
         letter-spacing: 0.06em;
         transition: all 0.2s;
       }
@@ -394,32 +398,44 @@
       }
 
       @media (prefers-color-scheme: dark) {
-        html:not([data-theme="light"]) .fi-purple {
+        html:not([data-theme='light']) .fi-purple {
           background: #2a2040;
         }
-        html:not([data-theme="light"]) .fi-teal {
+        html:not([data-theme='light']) .fi-teal {
           background: #1a2e2a;
         }
-        html:not([data-theme="light"]) .fi-red {
+        html:not([data-theme='light']) .fi-red {
           background: #2e1a18;
         }
-        html:not([data-theme="light"]) .fi-amber {
+        html:not([data-theme='light']) .fi-amber {
           background: #2e2418;
         }
-        html:not([data-theme="light"]) .fi-blue {
+        html:not([data-theme='light']) .fi-blue {
           background: #1a2230;
         }
-        html:not([data-theme="light"]) .fi-green {
+        html:not([data-theme='light']) .fi-green {
           background: #1a2e1e;
         }
       }
 
-      html[data-theme="dark"] .fi-purple { background: #2a2040; }
-      html[data-theme="dark"] .fi-teal { background: #1a2e2a; }
-      html[data-theme="dark"] .fi-red { background: #2e1a18; }
-      html[data-theme="dark"] .fi-amber { background: #2e2418; }
-      html[data-theme="dark"] .fi-blue { background: #1a2230; }
-      html[data-theme="dark"] .fi-green { background: #1a2e1e; }
+      html[data-theme='dark'] .fi-purple {
+        background: #2a2040;
+      }
+      html[data-theme='dark'] .fi-teal {
+        background: #1a2e2a;
+      }
+      html[data-theme='dark'] .fi-red {
+        background: #2e1a18;
+      }
+      html[data-theme='dark'] .fi-amber {
+        background: #2e2418;
+      }
+      html[data-theme='dark'] .fi-blue {
+        background: #1a2230;
+      }
+      html[data-theme='dark'] .fi-green {
+        background: #1a2e1e;
+      }
 
       .feature-card h3 {
         font-size: 17px;
@@ -606,7 +622,9 @@
         background: var(--bg-card);
         color: var(--text-secondary);
         cursor: pointer;
-        transition: border-color 0.2s, color 0.2s;
+        transition:
+          border-color 0.2s,
+          color 0.2s;
         flex-shrink: 0;
       }
 
@@ -615,20 +633,39 @@
         color: var(--text);
       }
 
-      .theme-toggle svg { width: 15px; height: 15px; }
-
-      .theme-toggle .icon-sun { display: none; }
-      .theme-toggle .icon-moon { display: block; }
-
-      @media (prefers-color-scheme: dark) {
-        html:not([data-theme="light"]) .theme-toggle .icon-sun { display: block; }
-        html:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
+      .theme-toggle svg {
+        width: 15px;
+        height: 15px;
       }
 
-      html[data-theme="dark"] .theme-toggle .icon-sun { display: block; }
-      html[data-theme="dark"] .theme-toggle .icon-moon { display: none; }
-      html[data-theme="light"] .theme-toggle .icon-sun { display: none; }
-      html[data-theme="light"] .theme-toggle .icon-moon { display: block; }
+      .theme-toggle .icon-sun {
+        display: none;
+      }
+      .theme-toggle .icon-moon {
+        display: block;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        html:not([data-theme='light']) .theme-toggle .icon-sun {
+          display: block;
+        }
+        html:not([data-theme='light']) .theme-toggle .icon-moon {
+          display: none;
+        }
+      }
+
+      html[data-theme='dark'] .theme-toggle .icon-sun {
+        display: block;
+      }
+      html[data-theme='dark'] .theme-toggle .icon-moon {
+        display: none;
+      }
+      html[data-theme='light'] .theme-toggle .icon-sun {
+        display: none;
+      }
+      html[data-theme='light'] .theme-toggle .icon-moon {
+        display: block;
+      }
 
       /* ANIMATE ON SCROLL */
       .fade-in {
@@ -666,11 +703,30 @@
           <button id="lang-ja" lang="ja" onclick="setLang('ja')">日</button>
         </div>
         <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">
-          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          <svg
+            class="icon-sun"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="4" />
+            <path
+              d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+            />
           </svg>
-          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          <svg
+            class="icon-moon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
           </svg>
         </button>
       </div>
@@ -867,8 +923,8 @@
             </div>
             <h3 data-i18n="f5_title">Multilingual & Themed</h3>
             <p data-i18n="f5_desc">
-              Supports English, Chinese, Korean, and Japanese with auto-detection. Switch between light, dark, and system
-              themes — all preferences persist across sessions.
+              Supports English, Chinese, Korean, and Japanese with auto-detection. Switch between light, dark, and
+              system themes — all preferences persist across sessions.
             </p>
           </div>
           <!-- f6: Real-Time Updates -->
@@ -1042,8 +1098,7 @@
           nav_how: '使用方式',
           hero_badge: 'macOS 实用工具',
           hero_title: '在 Ghostty 窗口间<br/><span>闪电切换</span>',
-          hero_sub:
-            '一个轻巧的菜单栏应用，列出所有 Ghostty 窗口——附带 Git 上下文、标签页信息和全局快捷键。',
+          hero_sub: '一个轻巧的菜单栏应用，列出所有 Ghostty 窗口——附带 Git 上下文、标签页信息和全局快捷键。',
           btn_download: '下载',
           btn_source: '源代码',
           btn_github: '在 GitHub 上查看',
@@ -1051,35 +1106,27 @@
           features_title: '你需要的都有，<br/>多余的一概没有',
           features_desc: 'Summon 静静地待在菜单栏，一键呈现所有 Ghostty 窗口及其丰富的上下文信息。',
           f1_title: '即时窗口列表',
-          f1_desc:
-            '在一个精巧面板里查看所有打开的 Ghostty 窗口，包括标题、工作目录、标签页数和 Git 仓库上下文。',
+          f1_desc: '在一个精巧面板里查看所有打开的 Ghostty 窗口，包括标题、工作目录、标签页数和 Git 仓库上下文。',
           f2_title: '可配置快捷键',
-          f2_desc:
-            '从五种全局快捷键中选择——Option+Space、Option+Tab 等——随时随地唤出面板。直接在托盘菜单中管理。',
+          f2_desc: '从五种全局快捷键中选择——Option+Space、Option+Tab 等——随时随地唤出面板。直接在托盘菜单中管理。',
           f3_title: '键盘导航',
-          f3_desc:
-            '方向键、Tab 和 ⌘1–⌘9 在窗口间跳转，Enter 激活，⌘N 新建终端，Escape 关闭——全程无需鼠标。',
+          f3_desc: '方向键、Tab 和 ⌘1–⌘9 在窗口间跳转，Enter 激活，⌘N 新建终端，Escape 关闭——全程无需鼠标。',
           f4_title: '托盘常驻',
-          f4_desc:
-            '常驻菜单栏，支持 macOS 原生毛玻璃效果和流畅动画。失焦自动隐藏，全桌面可见——不占用 Dock 位置。',
+          f4_desc: '常驻菜单栏，支持 macOS 原生毛玻璃效果和流畅动画。失焦自动隐藏，全桌面可见——不占用 Dock 位置。',
           f5_title: '多语言 & 主题',
           f5_desc:
             '支持英语、中文、韩语、日语并自动检测系统语言。在浅色、深色和跟随系统主题间切换——所有偏好跨会话保持。',
           f6_title: '实时更新',
-          f6_desc:
-            '新终端即时出现，关闭的自动消失。窗口列表始终反映最新状态——无需手动刷新。',
+          f6_desc: '新终端即时出现，关闭的自动消失。窗口列表始终反映最新状态——无需手动刷新。',
           how_label: '使用方式',
           how_title: '三步上手，零配置。',
           how_desc: 'Summon 通过 macOS 自动化与 Ghostty 通信，无需任何配置。',
           s1_title: '启动 Summon',
-          s1_desc:
-            '它默默出现在菜单栏中。按下你配置的全局快捷键——或点击托盘图标——唤出浮动面板。',
+          s1_desc: '它默默出现在菜单栏中。按下你配置的全局快捷键——或点击托盘图标——唤出浮动面板。',
           s2_title: '浏览窗口',
-          s2_desc:
-            '一个半透明面板展示所有打开的 Ghostty 窗口，包括标题、工作目录、标签页数和 Git 仓库名称。',
+          s2_desc: '一个半透明面板展示所有打开的 Ghostty 窗口，包括标题、工作目录、标签页数和 Git 仓库名称。',
           s3_title: '激活即走',
-          s3_desc:
-            '用键盘或鼠标选中窗口。Summon 立即激活它——甚至定位到正确的标签页——然后自动隐藏面板。',
+          s3_desc: '用键盘或鼠标选中窗口。Summon 立即激活它——甚至定位到正确的标签页——然后自动隐藏面板。',
           cta_title: '准备好掌控<br/>你的终端了吗？',
           cta_desc: 'Summon 免费、开源，基于 MIT 许可证。',
           footer_made: '由',
@@ -1089,8 +1136,7 @@
           nav_how: '사용 방법',
           hero_badge: 'macOS 유틸리티',
           hero_title: 'Ghostty 창을<br/><span>번개처럼 전환</span>',
-          hero_sub:
-            'Git 컨텍스트, 탭 정보, 글로벌 단축키를 갖춘 작은 메뉴 바 앱.',
+          hero_sub: 'Git 컨텍스트, 탭 정보, 글로벌 단축키를 갖춘 작은 메뉴 바 앱.',
           btn_download: '다운로드',
           btn_source: '소스 코드',
           btn_github: 'GitHub에서 보기',
@@ -1099,14 +1145,12 @@
           features_desc:
             'Summon은 메뉴 바에 조용히 상주하며 키 하나로 모든 Ghostty 창을 풍부한 컨텍스트와 함께 보여줍니다.',
           f1_title: '즉시 창 목록',
-          f1_desc:
-            '모든 Ghostty 창의 제목, 작업 디렉토리, 탭 수, Git 리포지토리 컨텍스트를 한 패널에서 확인하세요.',
+          f1_desc: '모든 Ghostty 창의 제목, 작업 디렉토리, 탭 수, Git 리포지토리 컨텍스트를 한 패널에서 확인하세요.',
           f2_title: '단축키 설정',
           f2_desc:
             'Option+Space, Option+Tab 등 다섯 가지 글로벌 단축키 중 선택하세요. 트레이 메뉴에서 바로 관리할 수 있습니다.',
           f3_title: '키보드 내비게이션',
-          f3_desc:
-            '방향키, Tab, ⌘1–⌘9로 창 간 이동. Enter로 활성화, ⌘N으로 새 터미널, Escape로 닫기 — 마우스 없이.',
+          f3_desc: '방향키, Tab, ⌘1–⌘9로 창 간 이동. Enter로 활성화, ⌘N으로 새 터미널, Escape로 닫기 — 마우스 없이.',
           f4_title: '트레이 네이티브',
           f4_desc:
             'macOS 네이티브 반투명 효과와 부드러운 애니메이션으로 메뉴 바에 상주. 포커스를 잃으면 자동 숨김, 모든 워크스페이스에서 표시 — Dock에는 나타나지 않습니다.',
@@ -1123,8 +1167,7 @@
           s1_desc:
             '메뉴 바에 조용히 시작됩니다. 설정한 글로벌 단축키를 누르거나 트레이 아이콘을 클릭하여 플로팅 패널을 띄우세요.',
           s2_title: '창 탐색',
-          s2_desc:
-            '반투명 패널에서 모든 Ghostty 창의 제목, 작업 디렉토리, 탭 수, Git 리포지토리 이름을 확인하세요.',
+          s2_desc: '반투명 패널에서 모든 Ghostty 창의 제목, 작업 디렉토리, 탭 수, Git 리포지토리 이름을 확인하세요.',
           s3_title: '활성화 & 이동',
           s3_desc:
             '키보드나 마우스로 창을 선택하세요. Summon이 해당 창을 활성화하고 — 올바른 탭까지 포커싱한 후 — 패널을 자동으로 숨깁니다.',
@@ -1137,8 +1180,7 @@
           nav_how: '使い方',
           hero_badge: 'macOS ユーティリティ',
           hero_title: 'Ghostty ウィンドウを<br/><span>瞬時に切り替え</span>',
-          hero_sub:
-            'Git コンテキスト、タブ情報、グローバルショートカットを備えた小さなメニューバーアプリ。',
+          hero_sub: 'Git コンテキスト、タブ情報、グローバルショートカットを備えた小さなメニューバーアプリ。',
           btn_download: 'ダウンロード',
           btn_source: 'ソースコード',
           btn_github: 'GitHub で見る',
@@ -1194,7 +1236,11 @@
       }
 
       function loadLang() {
-        try { return localStorage.getItem('lang') } catch { return null }
+        try {
+          return localStorage.getItem('lang')
+        } catch {
+          return null
+        }
       }
 
       let currentLang = loadLang()
@@ -1203,7 +1249,9 @@
       function setLang(lang) {
         if (!i18n[lang]) return
         currentLang = lang
-        try { localStorage.setItem('lang', lang) } catch {}
+        try {
+          localStorage.setItem('lang', lang)
+        } catch {}
         document.documentElement.lang = LANG_TAGS[lang] || 'en'
         LANGS.forEach((l) => document.getElementById('lang-' + l).classList.toggle('active', l === lang))
 
@@ -1227,7 +1275,9 @@
 
       function applyTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme)
-        try { localStorage.setItem('theme', theme) } catch {}
+        try {
+          localStorage.setItem('theme', theme)
+        } catch {}
       }
 
       function toggleTheme() {

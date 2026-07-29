@@ -1,0 +1,4 @@
+# Prevent `bun test` (Bun's built-in runner) from running this project's
+# Vitest-flavored tests. Use `bun run test` to invoke Vitest instead.
+[test]
+preload = ["./scripts/bun-test-guard.ts"]
