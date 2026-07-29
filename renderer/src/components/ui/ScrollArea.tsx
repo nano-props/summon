@@ -2,9 +2,9 @@ import { forwardRef, type ComponentPropsWithoutRef, type ComponentRef, type Ref 
 import * as RSA from '@radix-ui/react-scroll-area'
 import { cn } from '#/renderer/src/lib/utils.ts'
 
-export type ScrollAreaOrientation = 'vertical' | 'horizontal' | 'both'
+type ScrollAreaOrientation = 'vertical' | 'horizontal' | 'both'
 
-export interface ScrollAreaProps extends ComponentPropsWithoutRef<typeof RSA.Root> {
+interface ScrollAreaProps extends ComponentPropsWithoutRef<typeof RSA.Root> {
   orientation?: ScrollAreaOrientation
   viewportClassName?: string
   viewportRef?: Ref<HTMLDivElement>
@@ -54,7 +54,7 @@ interface ScrollBarProps extends ComponentPropsWithoutRef<typeof RSA.ScrollAreaS
   thumbClassName?: string
 }
 
-export const ScrollBar = forwardRef<ComponentRef<typeof RSA.ScrollAreaScrollbar>, ScrollBarProps>(function ScrollBar(
+const ScrollBar = forwardRef<ComponentRef<typeof RSA.ScrollAreaScrollbar>, ScrollBarProps>(function ScrollBar(
   { className, orientation = 'vertical', thumbClassName, ...props },
   ref,
 ) {

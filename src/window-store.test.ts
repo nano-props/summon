@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { gitRepoInfo } from '#/src/git.ts'
+import { listWindows } from '#/src/ghostty.ts'
 
 const state = vi.hoisted(() => ({
   windows: [] as Array<{ id: string; terminalId: string; title: string; cwd: string; tabCount: number }>,
@@ -16,6 +18,8 @@ vi.mock('#/src/git.ts', () => ({
 beforeEach(() => {
   state.windows = []
   state.repos.clear()
+  vi.mocked(listWindows).mockImplementation(async () => state.windows)
+  vi.mocked(gitRepoInfo).mockImplementation(async (cwd: string) => state.repos.get(cwd) ?? null)
 })
 
 async function importWindowStore() {
@@ -84,5 +88,52 @@ describe('window-store', () => {
         windows: [expect.objectContaining({ title: 'one' })],
       }),
     )
+  })
+
+  it('stops publishing to an unsubscribed listener', async () => {
+    const store = await importWindowStore()
+    const listener = vi.fn()
+    const unsubscribe = store.subscribeWindows(listener)
+    unsubscribe()
+    state.windows = [{ id: '1', terminalId: 't1', title: 'one', cwd: '/repo', tabCount: 1 }]
+
+    await store.refreshWindows()
+
+    expect(listener).not.toHaveBeenCalled()
+  })
+
+  it('shares the underlying work between concurrent refreshes', async () => {
+    const store = await importWindowStore()
+    let resolveWindows!: (windows: typeof state.windows) => void
+    const pendingWindows = new Promise<typeof state.windows>((resolve) => {
+      resolveWindows = resolve
+    })
+    vi.mocked(listWindows).mockReturnValueOnce(pendingWindows)
+
+    const first = store.refreshWindows()
+    const second = store.refreshWindows()
+    resolveWindows([{ id: '1', terminalId: 't1', title: 'one', cwd: '/repo', tabCount: 1 }])
+
+    await expect(Promise.all([first, second])).resolves.toEqual([
+      expect.objectContaining({ version: 1 }),
+      expect.objectContaining({ version: 1 }),
+    ])
+    expect(listWindows).toHaveBeenCalledTimes(1)
+  })
+
+  it('can refresh again after a failed query', async () => {
+    const store = await importWindowStore()
+    vi.mocked(listWindows).mockRejectedValueOnce(new Error('query failed'))
+
+    await expect(store.refreshWindows()).resolves.toEqual({ version: 0, windows: [] })
+
+    state.windows = [{ id: '1', terminalId: 't1', title: 'recovered', cwd: '/repo', tabCount: 1 }]
+    await expect(store.refreshWindows()).resolves.toEqual(
+      expect.objectContaining({
+        version: 1,
+        windows: [expect.objectContaining({ title: 'recovered' })],
+      }),
+    )
+    expect(listWindows).toHaveBeenCalledTimes(2)
   })
 })
